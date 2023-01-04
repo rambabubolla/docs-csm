@@ -76,4 +76,9 @@ tasks:
                 jq -r ".[] | select(.ExtraProperties.Aliases[] | contains(\"$TARGET_NCN\")) | .Xname")
             /host_usr_bin/csi handoff bss-update-param --delete metal.no-wipe --limit $TARGET_XNAME
             /host_usr_bin/csi handoff bss-update-param --set metal.no-wipe=0 --limit $TARGET_XNAME
+            
+            IMAGE_ID={{ `{{inputs.parameters.imageId}}` }}  # not sure this is accurate
+            ## ADD COMMAND HERE TO SET IMAGE ID IN BSS IF IMAGE_ID recieved IS NOT BLANK OR EMPTY ##
+            
+            
 {{end}}

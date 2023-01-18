@@ -40,6 +40,8 @@ to the exiting problem seen into the existing search. (The example searches for 
 * [`initrd.img.xz` not found](known_issues/initrd.img.zx_not_found.md)
 * [SSL Certificate Validation Issues](known_issues/ssl_certificate_validation_issues.md)
 * [SLS Not Working During Node Rebuild](known_issues/SLS_Not_Working_During_Node_Rebuild.md)
+* [Antero node NID allocation](known_issues/antero_node_NID_allocation.md)
+* [HPE nodes not properly transitioning power state](known_issues/hpe_systems_not_transitioning_power_state.md)
 
 ## Booting
 
@@ -60,7 +62,7 @@ to the exiting problem seen into the existing search. (The example searches for 
 ## Compute rolling upgrades
 
 CRUS was deprecated in CSM 1.2.0. It will be removed in a future CSM release and replaced with BOS V2, which will provide similar functionality.
-See [Deprecated features](../introduction/differences.md#deprecated_features).
+See [Deprecated features](../introduction/differences.md#deprecated-features).
 
 * [Nodes Failing to Upgrade in a CRUS Session](../operations/compute_rolling_upgrades/Troubleshoot_Nodes_Failing_to_Upgrade_in_a_CRUS_Session.md)
 * [Failed CRUS Session Because of Unmet Conditions](../operations/compute_rolling_upgrades/Troubleshoot_a_Failed_CRUS_Session_Due_to_Unmet_Conditions.md)
@@ -79,6 +81,8 @@ See [Deprecated features](../introduction/differences.md#deprecated_features).
 
 ## Customer Management Network (CMN)
 
+* [DHCP run book](dhcp_runbook.md)
+* [DNS run book](dns_runbook.md)
 * [General configuration and troubleshooting](../operations/network/management_network/README.md)
 * [Troubleshoot CMN Issues](../operations/network/customer_accessible_networks/Troubleshoot_CMN_Issues.md)
 * [Troubleshoot DHCP Issues](../operations/network/dhcp/Troubleshoot_DHCP_Issues.md)
@@ -127,6 +131,7 @@ See [Deprecated features](../introduction/differences.md#deprecated_features).
 
 * [Common Vault Cluster Issues](../operations/security_and_authentication/Troubleshoot_Common_Vault_Cluster_Issues.md)
 * [Keycloak User Localization](../operations/security_and_authentication/Keycloak_User_Localization.md)
+* [Troubleshoot Kyverno configuration manually](../operations/security_and_authentication/Troubleshoot_Kyverno_Configuration_manually.md)
 
 ## Spire
 

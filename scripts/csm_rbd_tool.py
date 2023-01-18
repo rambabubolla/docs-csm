@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2022-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -435,11 +435,11 @@ def main():
                         required=False,
                         dest='rbd_action',
                         default=False,
-                        help='"create/delete/map" an rbd device to store and decompress the csm tarball')
+                        help='"create/delete/move" an rbd device to store and decompress the csm tarball')
     parser.add_argument('--pool_action',
                         required=False,
                         dest='pool_action',
-                        help='Use with "--pool_action delete" to delete a predefined pool for and rbd device used with the csm tarball')
+                        help='Use with "--pool_action delete" to delete a predefined pool and rbd device used with the csm tarball')
     parser.add_argument('--target_host',
                         dest='target_host',
                         required=False,
@@ -448,7 +448,7 @@ def main():
     parser.add_argument('--csm_version',
                         required=False,
                         default='',
-                        help='The CSM version being installed or upgraded to.  This is used for the rbd device name.')
+                        help='The CSM version being installed or upgraded to.  This is used for the mount point name. [Future place holder]')
 
     args = parser.parse_args()
 

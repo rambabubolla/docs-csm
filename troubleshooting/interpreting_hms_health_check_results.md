@@ -10,11 +10,14 @@
   - [Functional test failure](#functional-test-failure)
 - [Tavern output](#tavern-output)
 - [Additional troubleshooting](#additional-troubleshooting)
+  - [`run_hms_ct_tests.sh`](#run_hms_ct_testssh)
+    - [`cray-hms-smd-test-functional`](#cray-hms-smd-test-functional)
+    - [`cray-hms-firmware-action-test-functional`](#cray-hms-firmware-action-test-functional)
   - [`hsm_discovery_status_test.sh`](#hsm_discovery_status_testsh)
     - [`HTTPsGetFailed`](#httpsgetfailed)
     - [`ChildVerificationFailed`](#childverificationfailed)
     - [`DiscoveryStarted`](#discoverystarted)
-- [Blocking vs. non-blocking failures](#blocking-vs-non-blocking-failures)
+- [Install blocking vs. Non-blocking failures](#install-blocking-vs-non-blocking-failures)
 
 ## Introduction
 
@@ -294,6 +297,212 @@ E   tavern.util.exceptions.TestFailError: Test 'Ensure the boot script service c
 
 This section provides guidance for handling specific HMS health check failures that may occur.
 
+### `run_hms_ct_tests.sh`
+
+This script runs the suite of HMS CT tests.
+
+#### `cray-hms-smd-test-functional`
+
+This job executes the tests for Hardware State Manager (HSM).
+
+##### `test_components.tavern.yaml` and `test_hardware.tavern.yaml`
+
+These tests require compute nodes to be discovered in HSM.
+
+The following is an example of a failed test execution due to no discovered compute nodes in HSM:
+
+```text
+Running functional tests...
+============================= test session starts ==============================
+platform linux -- Python 3.9.13, pytest-7.1.2, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /src/app, configfile: pytest.ini
+plugins: tavern-1.23.1
+collecting ... collected 38 items
+
+...
+
+test_components.tavern.yaml::Ensure that we can conduct a variety of queries on the Components collection FAILED [ 31%]
+
+...
+
+test_hardware.tavern.yaml::Query the Hardware collection for Node information FAILED [ 50%]
+
+...
+
+=================================== FAILURES ===================================
+_ /src/app/test_components.tavern.yaml::Ensure that we can conduct a variety of queries on the Components collection _
+
+...
+
+------------------------------ Captured log call -------------------------------
+WARNING  tavern.util.dict_util:dict_util.py:46 Formatting 'xname' will result in it being coerced to a string (it is a <class 'NoneType'>)
+
+...
+
+_ /src/app/test_hardware.tavern.yaml::Query the Hardware collection for Node information _
+
+...
+
+Errors:
+E   tavern.util.exceptions.TestFailError: Test 'Retrieve the hardware information for a given node xname from the Hardware collection' failed:
+    - Status code was 404, expected 200:
+        {"type": "about:blank", "title": "Not Found", "detail": "no such xname.", "status": 404}
+
+...
+
+------------------------------ Captured log call -------------------------------
+WARNING  tavern.util.dict_util:dict_util.py:46 Formatting 'node_xname' will result in it being coerced to a string (it is a <class 'NoneType'>)
+
+...
+
+=========================== short test summary info ============================
+FAILED test_components.tavern.yaml::Ensure that we can conduct a variety of queries on the Components collection
+FAILED test_hardware.tavern.yaml::Query the Hardware collection for Node information
+```
+
+(`ncn-mw#`) If these failures occur, confirm that there are no discovered compute nodes in HSM.
+
+```bash
+cray hsm state components list --type Node --role compute --format json
+```
+
+Example output:
+
+```text
+{
+  "Components": []
+}
+```
+
+There are several reasons why there may be no discovered compute nodes in HSM.
+
+The following situations do not warrant additional troubleshooting and the test failures can be safely ignored if:
+
+- There is no compute hardware physically connected to the system
+- All compute hardware in the system is powered off
+
+If none of the above cases are applicable, then the failures warrant additional troubleshooting:
+
+(`ncn-mw#`) Run the `hsm_discovery_status_test.sh` script.
+
+```bash
+/opt/cray/csm/scripts/hms_verification/hsm_discovery_status_test.sh
+```
+
+If the script fails, this indicates a discovery issue and further troubleshooting steps to take are printed.
+
+Otherwise, missing compute nodes in HSM with no discovery failures may indicate a problem with a `leaf-bmc` switch.
+
+(`ncn-mw#`) Check to see if the `leaf-bmc` switch resolves using the `nslookup` command.
+
+```bash
+nslookup <leaf-bmc-switch>
+```
+
+Example output:
+
+```text
+Server:     10.92.100.225
+Address:    10.92.100.225#53
+
+Name:   sw-leaf-bmc-001.nmn
+Address: 10.252.0.4
+```
+
+(`ncn-mw#`) Verify connectivity to the `leaf-bmc` switch.
+
+```bash
+ssh admin@<leaf-bmc-switch>
+```
+
+Example output:
+
+```text
+ssh: connect to host sw-leaf-bmc-001 port 22: Connection timed out
+```
+
+Restoring connectivity, resolving configuration issues, or restarting the relevant ports on the `leaf-bmc` switch should allow the compute hardware to issue DHCP requests and be discovered successfully.
+
+##### `test_components.tavern.yaml`
+
+These tests include checks for healthy BMC states in HSM.
+
+The following is an example of a failed test execution due to an unexpected BMC state in HSM:
+
+```text
+Running functional tests...
+============================= test session starts ==============================
+platform linux -- Python 3.9.13, pytest-7.1.2, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /src/app, configfile: pytest.ini
+plugins: tavern-1.23.1
+collecting ... collected 38 items
+
+...
+
+test_components.tavern.yaml::Ensure that we can conduct a query for all Node BMCs in the Component collection FAILED [ 26%]
+
+...
+
+Errors:
+E   tavern.util.exceptions.TestFailError: Test 'Verify the expected response fields for all NodeBMCs' failed:
+    - Error calling validate function '<function validate_pykwalify at 0x7f22cbaf0700>':
+        Traceback (most recent call last):
+          File "/usr/lib/python3.9/site-packages/tavern/schemas/files.py", line 106, in verify_generic
+            verifier.validate()
+          File "/usr/lib/python3.9/site-packages/pykwalify/core.py", line 194, in validate
+            raise SchemaError(u"Schema validation failed:\n - {error_msg}.".format(
+        pykwalify.errors.SchemaError: <SchemaError: error code 2: Schema validation failed:
+         - Enum 'Off' does not exist. Path: '/Components/1/State' Enum: ['Ready'].
+
+...
+
+=========================== short test summary info ============================
+FAILED test_components.tavern.yaml::Ensure that we can conduct a query for all Node BMCs in the Component collection
+=================== 1 failed, 37 passed in 214.09s (0:03:34) ===================
+```
+
+Test failures due to unexpected BMC states in HSM can be safely ignored if there are BMCs in the system that are intentionally powered off, such as during system shutdown and power off testing.
+
+#### `cray-hms-firmware-action-test-functional`
+
+This job executes the tests for the Firmware Action Service (FAS).
+
+##### `test_actions.tavern.yaml`
+
+These tests require at least one healthy BMC (State=Ready, Flag=OK) in HSM.
+
+The following is an example of a failed test execution due to no healthy BMCs in HSM:
+
+```text
+Running functional tests...
+============================= test session starts ==============================
+platform darwin -- Python 3.9.13, pytest-7.1.2, pluggy-1.0.0
+rootdir: /Users/schooler/Git/GitHub/hms-firmware-action/test/ct/api/1-non-disruptive, configfile: pytest.ini
+plugins: tavern-1.23.3
+collected 6 items
+
+...
+
+test_actions.tavern.yaml::Ensure that the BMC firmware can be updated with a FAS action FAILED [ 16%]
+
+...
+
+Errors:
+E   tavern.util.exceptions.TestFailError: Test 'Ensure that the BMC firmware can be updated with a FAS action' failed:
+    - Status code was 400, expected 202:
+        {"type": "about:blank", "detail": "invalid/duplicate xnames: [None]", "status": 400, "title": "Bad Request"}
+
+...
+
+=========================== short test summary info ============================
+FAILED test_actions.tavern.yaml::Ensure that the BMC firmware can be updated with a FAS action
+=================== 1 failed, 5 passed in 21.22s ===============================
+```
+
+Test failures due to no healthy BMCs in HSM can be safely ignored if the BMCs in the system are intentionally powered off, such as during system shutdown and power off testing.
+
 ### `hsm_discovery_status_test.sh`
 
 This test verifies that the system hardware has been discovered successfully.
@@ -302,8 +511,8 @@ The following is an example of a failed test execution:
 
 ```text
 Running hsm_discovery_status_test...
-(22:19:34) Running 'kubectl get secrets admin-client-auth -o jsonpath='{.data.client-secret}''...
-(22:19:34) Running 'curl -k -i -s -S -d grant_type=client_credentials -d client_id=admin-client -d client_secret=<REDACTED> https://api-gw-service-nmn.local/keycloak/realms/shasta/protocol/openid-connect/token'...
+(22:19:34) Getting client secret...
+(22:19:34) Retrieving authentication token...
 (22:19:35) Testing 'curl -s -k -H "Authorization: Bearer <REDACTED>" https://api-gw-service-nmn.local/apis/smd/hsm/v2/Inventory/RedfishEndpoints'...
 (22:19:35) Processing response with: 'jq '.RedfishEndpoints[] | { ID: .ID, LastDiscoveryStatus: .DiscoveryInfo.LastDiscoveryStatus}' -c | sort -V | jq -c'...
 (19:06:02) Verifying endpoint discovery statuses...
@@ -321,7 +530,7 @@ determine the cause of the failure:
 
 #### `HTTPsGetFailed`
 
-1. (`ncn#`) Check to see if the failed component name (xname) resolves using the `nslookup` command.
+1. (`ncn-mw#`) Check to see if the failed component name (xname) resolves using the `nslookup` command.
 
     If not, then the problem may be a DNS issue.
 
@@ -329,7 +538,7 @@ determine the cause of the failure:
     nslookup <xname>
     ```
 
-1. (`ncn#`) Check to see if the failed component name (xname) responds to the `ping` command.
+1. (`ncn-mw#`) Check to see if the failed component name (xname) responds to the `ping` command.
 
     If not, then the problem may be a network or hardware issue.
 
@@ -337,7 +546,7 @@ determine the cause of the failure:
     ping -c 1 <xname>
     ```
 
-1. (`ncn#`) Check to see if the failed component name (xname) responds to a Redfish query.
+1. (`ncn-mw#`) Check to see if the failed component name (xname) responds to a Redfish query.
 
     If not, then the problem may be a credentials issue. Use the password set in the REDS sealed secret.
 
@@ -391,18 +600,18 @@ The endpoint is in the process of being inventoried by Hardware State Manager (H
 cray hsm inventory redfishEndpoints describe <xname>
 ```
 
-## Blocking vs. non-blocking failures
+## Install blocking vs. Non-blocking failures
 
-The HMS health checks include tests for multiple types of system components, only some of which are critical for the installation or upgrade of the system.
+The HMS health checks include tests for multiple types of system components, some of which are critical for the installation of the system, while others are not.
 
 The following types of HMS test failures should be considered blocking for system installations:
 
 - HMS service pods not running
-- HMS service APIs unreachable through API calls or the Cray CLI
-- Failures related to HMS discovery (unreachable BMCs, unresponsive controller hardware, no Redfish connectivity)
+- HMS service APIs unreachable through the API Gateway or Cray CLI
+- Failures related to HMS discovery (for example: unreachable BMCs, unresponsive controller hardware, or no Redfish connectivity)
 
-The following types of HMS test failures should **not** be considered blocking for system installations or upgrades:
+The following types of HMS test failures should **not** be considered blocking for system installations:
 
-- Failures due to hardware issues on individual compute nodes (alerts or warning flags set in HSM)
+- Failures because of hardware issues on individual nodes (alerts or warning flags set in HSM)
 
 It is typically safe to postpone the investigation and resolution of non-blocking failures until after the CSM installation or upgrade has completed.

@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -22,7 +22,10 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 
-NAME ?= ${GIT_REPO_NAME}
+ifeq ($(NAME),)
+NAME := $(shell basename $(shell pwd))
+endif
+
 ifeq ($(VERSION),)
 VERSION := $(shell git describe --tags | tr -s '-' '~' | tr -d '^v')
 endif

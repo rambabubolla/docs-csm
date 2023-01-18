@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -103,10 +103,19 @@ if [[ -z "$(yq r "$c" "spec.network.netstaticips.nmn_ncn_storage_mons")" ]]; the
   done
   yq w -i --style=single "$c" spec.kubernetes.services.cray-sysmgmt-health.cephExporter.endpoints '{{ network.netstaticips.nmn_ncn_storage_mons }}'
 fi
-
+if [[ "$(yq r "$c" "spec.kubernetes.services.cray-sysmgmt-health.prometheus-snmp-exporter.serviceMonitor.enabled")" ]]; then
+    idx=0
+    temp=1
+    mon_node=$(yq r "$c" 'spec.kubernetes.services.cray-sysmgmt-health.prometheus-snmp-exporter.serviceMonitor.params.conf.target' | awk '{print $2}')
+    for node in ${mon_node}; do
+      yq w -i "$c" "spec.kubernetes.services.cray-sysmgmt-health.prometheus-snmp-exporter.serviceMonitor.params[${idx}].name" "snmp$temp"
+      yq w -i "$c" "spec.kubernetes.services.cray-sysmgmt-health.prometheus-snmp-exporter.serviceMonitor.params[${idx}].target" "${node}"
+      idx=$(( idx+1 ))
+      temp=$(( temp+1 ))
+    done
+fi
 if [[ "$inplace" == "yes" ]]; then
     cp "$c" "$customizations"
 else
     cat "$c"
 fi
-

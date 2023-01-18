@@ -47,16 +47,31 @@ Any steps run on an `external` server require that server to have the following 
    > - **If air-gapped or behind a strict firewall**, then the tarball must be obtained from the medium delivered by Cray-HPE. For these cases, copy or download the tarball to the working
    >   directory and then proceed to the next step. The tarball will need to be fetched with `scp` during the [Download CSM tarball](#21-download-csm-tarball) step.
 
-   ```bash
-   # e.g. an alpha : CSM_RELEASE=1.3.0-alpha.99
-   # e.g. an RC    : CSM_RELEASE=1.3.0-rc.1
-   # e.g. a stable : CSM_RELEASE=1.3.0  
-   CSM_RELEASE=1.3.0-alpha.9
-   ```
+   1. (`external#`) Set the CSM RELEASE version
 
-   ```bash
-   curl -C - -O "https://artifactory.algol60.net/artifactory/csm-releases/csm/$(awk -F. '{print $1"."$2}' <<< ${CSM_RELEASE})/csm-${CSM_RELEASE}.tar.gz"
-   ```
+      ```bash
+      # e.g. an alpha : CSM_RELEASE=1.3.0-alpha.99
+      # e.g. an RC    : CSM_RELEASE=1.3.0-rc.1
+      # e.g. a stable : CSM_RELEASE=1.3.0  
+      CSM_RELEASE=1.3.0-alpha.9
+      ```
+
+   1. (`external#`) Download the CSM tarball
+
+      > ***NOTE:*** CSM does NOT support the use of proxy servers for anything other than downloading artifacts from external endpoints.
+      Using `http_proxy` or `https_proxy` in any way other than the following examples will cause many failures in subsequent steps.
+
+      - Without proxy:
+
+        ```bash
+        curl -C - -f -O "https://release.algol60.net/$(awk -F. '{print "csm-"$1"."$2}' <<< ${CSM_RELEASE})/csm/csm-${CSM_RELEASE}.tar.gz"
+        ```
+
+      - With https proxy:
+
+        ```bash
+        https_proxy=https://example.proxy.net:443 curl -C - -f -O "https://release.algol60.net/$(awk -F. '{print "csm-"$1"."$2}' <<< ${CSM_RELEASE})/csm/csm-${CSM_RELEASE}.tar.gz"
+        ```
 
 1. (`external#`) Extract the LiveCD from the tarball.
 
@@ -145,7 +160,7 @@ On first login, the LiveCD will prompt the administrator to change the password.
 
 1. (`pit#`) Configure the site-link (`lan0`), DNS, and gateway IP addresses.
 
-   1. Set `site_ip`, `site_gw`, and `site_dns` variables.
+   1. Set `site_ip`, `site_gw`, `site_dns`, and `SYSTEM_NAME`  variables.
 
       > **NOTE:** The `site_ip`, `site_gw`, and `site_dns` values must come from the local network administration or authority.
 
@@ -162,6 +177,11 @@ On first login, the LiveCD will prompt the administrator to change the password.
       ```bash
       # IPv4 Format: A.B.C.D
       site_dns=
+      ```
+
+      ```bash
+      # Name of the system. This will only be used for the pit hostname. This variable is capitlized because it will be used in a subsequent section.
+      SYSTEM_NAME=
       ```
 
    1. Set `site_nics` variable.
@@ -181,7 +201,7 @@ On first login, the LiveCD will prompt the administrator to change the password.
       > - The hostname is auto-resolved based on reverse DNS.
 
       ```bash
-      /root/bin/csi-setup-lan0.sh "${site_ip}" "${site_gw}" "${site_dns}" "${site_nics}"
+      /root/bin/csi-setup-lan0.sh "${SYSTEM_NAME}" "${site_ip}" "${site_gw}" "${site_dns}" "${site_nics}"
       ```
 
 1. (`pit#`) Verify that the assigned IP address was successfully applied to `lan0` .
@@ -241,9 +261,9 @@ These variables will need to be set for many procedures within the CSM installat
       The value is based on the version of the CSM release being installed.
 
       ```bash
-      # e.g. an alpha : CSM_RELEASE=1.3.0-alpha.99
-      # e.g. an RC    : CSM_RELEASE=1.3.0-rc.1
-      # e.g. a stable : CSM_RELEASE=1.3.0  
+      # e.g. an alpha : CSM_RELEASE=1.4.0-alpha.99
+      # e.g. an RC    : CSM_RELEASE=1.4.0-rc.1
+      # e.g. a stable : CSM_RELEASE=1.4.0  
       export CSM_RELEASE=<value>
       ```
 
@@ -361,10 +381,20 @@ These variables will need to be set for many procedures within the CSM installat
    - From Cray using `curl`:
 
       > - `-C -` is used to allow partial downloads. These tarballs are large; in the event of a connection disruption, the same `curl` command can be used to continue the disrupted download.
+      > - CSM does NOT support the use of proxy servers for anything other than downloading artifacts from external endpoints. Using `http_proxy` or `https_proxy` in any way other than the following examples will cause many failures in subsequent steps.
+
+      Without proxy:
 
       ```bash
-      curl -C - -o "/var/www/ephemeral/csm-${CSM_RELEASE}.tar.gz" \
-        "https://artifactory.algol60.net/artifactory/csm-releases/csm/$(awk -F. '{print $1"."$2}' <<< ${CSM_RELEASE})/csm-${CSM_RELEASE}.tar.gz"
+      curl -C - -f -o "/var/www/ephemeral/csm-${CSM_RELEASE}.tar.gz" \
+        "https://release.algol60.net/$(awk -F. '{print "csm-"$1"."$2}' <<< ${CSM_RELEASE})/csm/csm-${CSM_RELEASE}.tar.gz"
+      ```
+
+      With https proxy:
+
+      ```bash
+      https_proxy=https://example.proxy.net:443 curl -C - -f -o "/var/www/ephemeral/csm-${CSM_RELEASE}.tar.gz" \
+        "https://release.algol60.net/$(awk -F. '{print "csm-"$1"."$2}' <<< ${CSM_RELEASE})/csm/csm-${CSM_RELEASE}.tar.gz"
       ```
 
    - `scp` from the external server used in [Prepare installation environment server](#11-prepare-installation-environment-server):
@@ -381,7 +411,7 @@ in `/etc/environment` from the [Download CSM tarball](#21-download-csm-tarball) 
 1. (`pit#`) Extract the tarball.
 
    ```bash
-   tar -C "${PITDATA}" -zxvf "csm-${CSM_RELEASE}.tar.gz"
+   tar -zxvf  "${PITDATA}/csm-${CSM_RELEASE}.tar.gz" -C ${PITDATA}
    ```
 
 1. (`pit#`) Install/update the RPMs necessary for the CSM installation.
@@ -394,8 +424,7 @@ in `/etc/environment` from the [Download CSM tarball](#21-download-csm-tarball) 
 
        ```bash
        zypper \
-           --plus-repo "${CSM_PATH}/rpm/cray/csm/sle-15sp2/" \
-           --plus-repo "${CSM_PATH}/rpm/cray/csm/sle-15sp3/" \
+           --plus-repo "${CSM_PATH}/rpm/cray/csm/sle-$(awk -F= '/VERSION=/{gsub(/["-]/, "") ; print tolower($NF)}' /etc/os-release)/" \
            --no-gpg-checks \
            install -y docs-csm
        ```
@@ -407,8 +436,7 @@ in `/etc/environment` from the [Download CSM tarball](#21-download-csm-tarball) 
 
        ```bash
        zypper \
-           --plus-repo "${CSM_PATH}/rpm/cray/csm/sle-15sp2/" \
-           --plus-repo "${CSM_PATH}/rpm/cray/csm/sle-15sp3/" \
+           --plus-repo "${CSM_PATH}/rpm/cray/csm/sle-$(awk -F= '/VERSION=/{gsub(/["-]/, "") ; print tolower($NF)}' /etc/os-release)/" \
            --no-gpg-checks \
            update -y cray-site-init
        ```
@@ -419,8 +447,7 @@ in `/etc/environment` from the [Download CSM tarball](#21-download-csm-tarball) 
 
        ```bash
        zypper \
-           --plus-repo "${CSM_PATH}/rpm/cray/csm/sle-15sp2/" \
-           --plus-repo "${CSM_PATH}/rpm/cray/csm/sle-15sp3/" \
+           --plus-repo "${CSM_PATH}/rpm/cray/csm/sle-$(awk -F= '/VERSION=/{gsub(/["-]/, "") ; print tolower($NF)}' /etc/os-release)/" \
            --no-gpg-checks \
            install -y csm-testing
       ```
@@ -428,8 +455,10 @@ in `/etc/environment` from the [Download CSM tarball](#21-download-csm-tarball) 
 1. (`pit#`) Get the artifact versions.
 
    ```bash
-   KUBERNETES_VERSION="$(find ${CSM_PATH}/images/kubernetes -name '*.squashfs' -exec basename {} .squashfs \; | awk -F '-' '{print $NF}')"
-   CEPH_VERSION="$(find ${CSM_PATH}/images/storage-ceph -name '*.squashfs' -exec basename {} .squashfs \; | awk -F '-' '{print $NF}')"
+   KUBERNETES_VERSION="$(find ${CSM_PATH}/images/kubernetes -name '*.squashfs' -exec basename {} .squashfs \; | awk -F '-' '{print $(NF-1)}')"
+   echo "${KUBERNETES_VERSION}"
+   CEPH_VERSION="$(find ${CSM_PATH}/images/storage-ceph -name '*.squashfs' -exec basename {} .squashfs \; | awk -F '-' '{print $(NF-1)}')"
+   echo "${CEPH_VERSION}"
    ```
 
 1. (`pit#`) Copy the NCN images from the expanded tarball.
@@ -470,8 +499,8 @@ in `/etc/environment` from the [Download CSM tarball](#21-download-csm-tarball) 
        echo "${NCN_MOD_SCRIPT}"
        "${NCN_MOD_SCRIPT}" -p \
           -d /root/.ssh \
-          -k "/var/www/ephemeral/data/k8s/${KUBERNETES_VERSION}/kubernetes-${KUBERNETES_VERSION}.squashfs" \
-          -s "/var/www/ephemeral/data/ceph/${CEPH_VERSION}/storage-ceph-${CEPH_VERSION}.squashfs"
+          -k "/var/www/ephemeral/data/k8s/${KUBERNETES_VERSION}/kubernetes-${KUBERNETES_VERSION}-$(uname -i).squashfs" \
+          -s "/var/www/ephemeral/data/ceph/${CEPH_VERSION}/storage-ceph-${CEPH_VERSION}-$(uname -i).squashfs"
        ```
 
 1. (`pit#`) Log the currently installed PIT packages.
@@ -599,6 +628,8 @@ this step may be skipped.
    > - For more description of these settings and the default values, see
    >   [Default IP Address Ranges](../introduction/csm_overview.md#2-default-ip-address-ranges) and the other topics in
    >   [CSM Overview](../introduction/csm_overview.md).
+   > - To enable or disable audit logging, refer to [Audit Logs](../operations/security_and_authentication/Audit_Logs.md)
+   >   for more information.
    > - If the system is using a `cabinets.yaml` file, be sure to update the `cabinets-yaml` field with `'cabinets.yaml'` as its value.
 
    ```bash
@@ -643,7 +674,7 @@ Follow the [Prepare Site Init](prepare_site_init.md) procedure.
    export IPMI_PASSWORD
    ```
 
-1. (`pit#`) Setup boot links to the artifacts extracted from the CSM tarball.
+1. (`pit#`) Setup links to the boot artifacts extracted from the CSM tarball.
 
    > ***NOTES***
    >

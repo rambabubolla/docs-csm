@@ -1,6 +1,6 @@
 # Cray System Management (CSM) - Release Notes
 
-CSM 1.3 contains approximately 500 changes spanning bug fixes, new feature development, and documentation improvements. This page lists some of the highlights.
+CSM 1.4 contains approximately 500 changes spanning bug fixes, new feature development, and documentation improvements. This page lists some of the highlights.
 
 ## New
 
@@ -22,6 +22,7 @@ CSM 1.3 contains approximately 500 changes spanning bug fixes, new feature devel
 * Technology Preview: Tenant and Partition Management Service (TAPMS)
 * Support for setting of Bios Settings through SCSD
 * Ability to set power cap on multiple computes
+* Included SAT CLI in CSM (see [SAT in CSM](operations/sat/sat_in_csm.md))
 
 ### New hardware support
 
@@ -62,7 +63,8 @@ CSM 1.3 contains approximately 500 changes spanning bug fixes, new feature devel
 ### Documentation enhancements
 
 * Added documentation for:
-  * Add/Remove/Replace NCN procedures using `sat swap blade`
+  * Add/Remove/Replace NCN procedures
+  * Add/Remove/Replace compute nodes using `sat swap blade`
   * How to troubleshoot `ncn-m001` PXE loop
   * NCN image modification using IMS and CFS
   * Minimal space requirements for CSM V1.3.0
@@ -75,17 +77,23 @@ CSM 1.3 contains approximately 500 changes spanning bug fixes, new feature devel
 
 ## Deprecations
 
+The following features are now deprecated and will be removed from CSM in a future release.
+
 * CAPMC v1 partial deprecation
 * HSM v1 interface
+* [BOS](glossary.md#boot-orchestration-service-bos) v1 is now deprecated, in favor of BOS v2. BOS v1 will be removed from CSM in the CSM 1.9 release.
+  * It is likely that even prior to BOS v1 being removed from CSM, the [Cray CLI](glossary.md#cray-cli-cray) will change its behavior when no
+    version is explicitly specified in BOS commands. Currently it defaults to BOS v1, but it may change to default to BOS v2 even before BOS v1
+    is removed from CSM.
 
-See [Deprecated features](introduction/differences.md#deprecated_features).
+See [Deprecated features](introduction/differences.md#deprecated-features).
 
 ## Removals
 
-* TBD
+* SLS support for downloading and uploading credentials in the `dumpstate` and `loadstate` REST APIs
 
 ## Known issues
 
-### Security vulnerability exceptions in CSM 1.3
+### Security vulnerability exceptions in CSM 1.4
 
 * TBD

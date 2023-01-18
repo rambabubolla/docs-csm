@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+#
 # MIT License
 #
-# (C) Copyright [2022] Hewlett Packard Enterprise Development LP
+# (C) Copyright 2022-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -20,7 +21,7 @@
 # OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-
+#
 #pylint: disable=missing-docstring, C0301, C0103, C0302
 
 import subprocess
@@ -472,6 +473,12 @@ def get_component_parent(xname:str):
 # SLS IPAM functions
 #
 
+class ExhaustedAvailableIPAddressSpace(Exception):
+    pass
+
+class AllocatedIPIsOutsideStaticRange(Exception):
+    pass
+
 def find_next_available_ip(sls_subnet: SLSSubnet, cidr_override: IPv4Address=None, starting_ip: netaddr.IPAddress=None) -> netaddr.IPAddress:
     subnet = netaddr.IPNetwork(str(sls_subnet.ipv4_address()))
 
@@ -482,7 +489,6 @@ def find_next_available_ip(sls_subnet: SLSSubnet, cidr_override: IPv4Address=Non
     existing_ip_reservations = netaddr.IPSet()
     existing_ip_reservations.add(str(sls_subnet.ipv4_gateway()))
     for ip_reservation in sls_subnet.reservations().values():
-        #print("  Found existing IP reservation {} with IP {}".format(ip_reservation.name(), ip_reservation.ipv4_address()))
         existing_ip_reservations.add(str(ip_reservation.ipv4_address()))
 
     # Start looking for IPs after the gateway of the beginning of the subnet
@@ -492,14 +498,12 @@ def find_next_available_ip(sls_subnet: SLSSubnet, cidr_override: IPv4Address=Non
             continue
 
         if available_ip not in existing_ip_reservations:
-            #print("  {} Available for use.".format(available_ip))
             return available_ip
 
     # Exhausted available IP address
-    return None
+    raise ExhaustedAvailableIPAddressSpace()
 
 def allocate_ip_address_in_subnet(action: dict, networks: NetworkManager, network_name: str, subnet_name: str, networks_allowed_in_dhcp_range: list=[]):
-    fail_ip_address_allocation = False
 
     network = networks[network_name]
     subnets = network.subnets()
@@ -546,12 +550,8 @@ def allocate_ip_address_in_subnet(action: dict, networks: NetworkManager, networ
             if network_name in networks_allowed_in_dhcp_range:
                 action_log(action, f'Warning the allocated IP {next_free_ip} is outside of the static IP address range for the bootstrap_dhcp subnet in the {network_name} network')
             else:
-                fail_ip_address_allocation = True
                 action_log(action, f'Error the allocated IP {next_free_ip} is outside of the static IP address range for the bootstrap_dhcp subnet in the {network_name} network')
-
-    if fail_ip_address_allocation:
-        print_action(action)
-        sys.exit(1)
+                raise AllocatedIPIsOutsideStaticRange()
 
     return next_free_ip
 
@@ -736,7 +736,12 @@ class State:
         # Allocate new NCN BMC
         #
         action_log(action, "Allocating NCN BMC IP address")
-        bmc_ip = allocate_ip_address_in_subnet(action, self.sls_networks, "HMN", "bootstrap_dhcp")
+        bmc_ip = None
+        try:
+            bmc_ip = allocate_ip_address_in_subnet(action, self.sls_networks, "HMN", "bootstrap_dhcp")
+        except (AllocatedIPIsOutsideStaticRange, ExhaustedAvailableIPAddressSpace):
+            print_action(action)
+            sys.exit(1)
 
         # Add BMC IP reservation to the HMN network.
         # Example: {"Aliases":["ncn-s001-mgmt"],"Comment":"x3000c0s13b0","IPAddress":"10.254.1.31","Name":"x3000c0s13b0"}
@@ -760,7 +765,11 @@ class State:
             if network_name not in self.sls_networks:
                 continue
 
-            ncn_ips[network_name] = allocate_ip_address_in_subnet(action, self.sls_networks, network_name, "bootstrap_dhcp", self.networks_allowed_in_dhcp_range)
+            try:
+                ncn_ips[network_name] = allocate_ip_address_in_subnet(action, self.sls_networks, network_name, "bootstrap_dhcp", self.networks_allowed_in_dhcp_range)
+            except (AllocatedIPIsOutsideStaticRange, ExhaustedAvailableIPAddressSpace):
+                print_action(action)
+                sys.exit(1)
 
         action_log(action, "Removing temporary NCN BMC IP reservation in the bootstrap_dhcp subnet for the HMN network")
         del self.sls_networks["HMN"].subnets()["bootstrap_dhcp"].reservations()[bmc_ip_reservation.name()]
@@ -888,7 +897,7 @@ class State:
                     expected_alias = f'{self.ncn_alias}.{network_name.lower()}'
                     if str(ip) == host_record["ip"]:
                         expected_aliases = [expected_alias]
-                        alternate_aliases = [] # ncn-m001 on the NMN can have an alternate host record for the the PIT
+                        alternate_aliases = [] # ncn-m001 on the NMN can have an alternate host record for the PIT
                         if network_name == "NMN":
                             expected_aliases.append(self.ncn_alias)
                             alternate_aliases = ["pit", "pit.nmn"]
@@ -1694,8 +1703,10 @@ def ncn_data_command(session: requests.Session, args, state: State):
     bootparams["cloud-init"]["user-data"]["local_hostname"] = state.ncn_alias
     if "ntp" in bootparams["cloud-init"]["user-data"]:
         bootparams["cloud-init"]["user-data"]["ntp"]["allow"] = []
-        for network_name, ip_cidr in ncn_cidrs.items():
-            bootparams["cloud-init"]["user-data"]["ntp"]["allow"].append(ip_cidr)
+        for network_name in ["HMN", "NMN", "HMN_RVR", "NMN_RVR", "NMN_MTN", "HMN_MTN"]:
+            if  network_name in sls_networks:
+                subnet_cidr = str(sls_networks[network_name].ipv4_address())
+                bootparams["cloud-init"]["user-data"]["ntp"]["allow"].append(subnet_cidr)
     bootparams["cloud-init"]["meta-data"]["availability-zone"] = cabinet_xname
     bootparams["cloud-init"]["meta-data"]["instance-id"] = generate_instance_id()
     bootparams["cloud-init"]["meta-data"]["local-hostname"] = state.ncn_alias
@@ -1853,8 +1864,9 @@ def ncn_data_command(session: requests.Session, args, state: State):
 
         if interface == "mgmt0":
             ei["Description"] = "- kea"
-            for network in ["NMN", "CAN", "MTL", "HMN"]:
-                ei["IPAddresses"].append({"IPAddress": str(state.ncn_ips[network])})
+            for network in ["NMN", "CAN", "CMN", "MTL", "HMN"]:
+                if network in state.ncn_ips:
+                    ei["IPAddresses"].append({"IPAddress": str(state.ncn_ips[network])})
 
         print(f"Adding MAC Addresses {mac} to HSM Inventory EthernetInterfaces")
         print(json.dumps(ei, indent=2))

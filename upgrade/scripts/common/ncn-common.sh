@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -29,6 +29,27 @@ basedir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 trap 'err_report' ERR
 touch /etc/cray/upgrade/csm/myenv
 . /etc/cray/upgrade/csm/myenv
+
+rc=0
+
+if [[ -z ${CSM_RELEASE} ]]; then
+    echo "ERROR: CSM_RELEASE environment variable is not set and must be present in /etc/cray/upgrade/csm/myenv."
+    rc=$((rc+1))
+fi
+
+if [[ -z ${CSM_ARTI_DIR} ]]; then
+    echo "ERROR: CSM_ARTI_DIR environment variable is not set and must be present in /etc/cray/upgrade/csm/myenv."
+    rc=$((rc+1))
+fi
+
+if [[ -z ${CSM_REL_NAME} ]]; then
+    echo "ERROR: CSM_REL_NAME environment variable is not set and must be present in /etc/cray/upgrade/csm/myenv."
+    rc=$((rc+1))
+fi
+
+if [ "${rc}" -gt 0 ]; then
+  return $rc
+fi
 
 if [[ -z ${LOG_FILE} ]]; then
     #shellcheck disable=SC2155

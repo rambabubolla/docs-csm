@@ -24,10 +24,7 @@ The areas should be tested in the order they are listed on this page. Errors in 
   - [2.2 Hardware State Manager discovery validation](#22-hardware-state-manager-discovery-validation)
     - [2.2.1 Interpreting HSM discovery results](#221-interpreting-hsm-discovery-results)
     - [2.2.2 Known issues with HSM discovery validation](#222-known-issues-with-hsm-discovery-validation)
-- [3. Software Management Services health checks](#3-software-management-services-health-checks)
-  - [3.1 SMS test execution](#31-sms-test-execution)
-  - [3.2 Interpreting `cmsdev` results](#32-interpreting-cmsdev-results)
-  - [3.3 Known issues with SMS tests](#33-known-issues-with-sms-tests)
+- [3. Software Management Services health checks](#3-software-management-services-sms-health-checks)
 - [4. Gateway health and SSH access checks](#4-gateway-health-and-ssh-access-checks)
   - [4.1 Gateway health tests](#41-gateway-health-tests)
     - [4.1.1 Gateway health tests overview](#411-gateway-health-tests-overview)
@@ -55,8 +52,7 @@ descriptions below. These tests may be skipped but **this is not recommended**.
 
 The Cray CLI must be configured on all NCNs and the PIT node. The following procedures explain how to do this:
 
-1. [Configure Keycloak Account](../install/configure_administrative_access.md#1-configure-keycloak-account)
-1. [Configure the Cray Command Line Interface (CLI)](../install/configure_administrative_access.md#2-configure-the-cray-command-line-interface)
+1. [Configure the Cray command line interface](../install/configure_administrative_access.md#1-configure-the-cray-command-line-interface)
 
 ## 1. Platform health checks
 
@@ -120,7 +116,7 @@ If all designated prerequisites are met, the availability of system management h
 [Access System Management Health Services](system_management_health/Access_System_Management_Health_Services.md).
 It is very important to check the `Prerequisites` section of this document.
 
-If one or more of the the URLs listed in the procedure are inaccessible, it does not necessarily mean that system is not healthy. It may simply mean that not all of the
+If one or more of the URLs listed in the procedure are inaccessible, it does not necessarily mean that system is not healthy. It may simply mean that not all of the
 prerequisites have been met to allow access to the system management health tools via URL.
 
 Information to assist with troubleshooting some of the components mentioned in the prerequisites can be accessed here:
@@ -338,12 +334,13 @@ BMC can be safely ignored or needs to be addressed before proceeding.
 - In Hill configurations SLS assumes BMCs in chassis 1 and 3 are fully populated (32 Node BMCs), and in Mountain configurations SLS assumes all BMCs are fully populated (128 Node BMCs). Any non-populated
   BMCs will have no HSM data and will show up in the mismatch list.
 
-If it was determined that the mismatch can not be ignored, then proceed onto the the [2.2.2 Known Issues](#222-known-issues-with-hsm-discovery-validation) below to troubleshoot any mismatched BMCs.
+If it was determined that the mismatch can not be ignored, then proceed onto the [2.2.2 Known Issues](#222-known-issues-with-hsm-discovery-validation) below to troubleshoot any mismatched BMCs.
 
 #### 2.2.2 Known issues with HSM discovery validation
 
 Known issues that may prevent hardware from getting discovered by Hardware State Manager:
 
+- Switches with river cabinets require SNMP to be enabled for discovery to work. For configuring SNMP, see [Configure SNMP](./network/management_network/configure_snmp.md)
 - [HMS Discovery job not creating Redfish Endpoints in Hardware State Manager](../troubleshooting/known_issues/discovery_job_not_creating_redfish_endpoints.md)
 
 ## 3 Software Management Services (SMS) health checks
@@ -422,7 +419,9 @@ Overall status: PASSED (Passed: 40, Failed: 0)
 
 ### 4.3 External SSH access test execution
 
-The external SSH access tests may be run on any system external to the cluster.
+The external SSH access tests may be run on any system external to the cluster. The tests should not be run from another system
+running the Cray System Management software if that system was configured with the same internal network ranges as the system
+being tested as this will cause some tests to fail.
 
 1. (`external#`) Python version 3 must be installed (if it is not already).
 
@@ -553,7 +552,7 @@ This section can be run on any NCN or the PIT node.
     version = "1.11.5"
     ```
 
-    In this example output, it shows that UAS is installed and running the `1.11.5` version.
+    In this example output, it shows that UAS is installed and running the `1.11.5` version. If the error "Token not valid for UAS" occurs, see [Authorization issues](#641-authorization-issues).
 
 1. (`ncn#` or `pit#`) List UAIs on the system.
 
@@ -596,6 +595,9 @@ This section can be run on any NCN or the PIT node.
    > from incorrect or incomplete installation of these products will generally take the form of UAIs stuck in
    > waiting state trying to set up volume mounts. See the
    > [UAI Troubleshooting](#64-uasuai-troubleshooting) section for more information.
+   > **IMPORTANT:** If the site is configured to use the CHN, and the high speed network has not been
+   > installed and configured, this procedure can not be completed. The UAI that is created will be inaccessible
+   > until the high speed network is available.
 
 This procedure must run on a master or worker node (**not the PIT node**).
 
@@ -750,7 +752,7 @@ Try 'cray uas list --help' for help.
 Error: Bad Request: Token not valid for UAS. Attributes missing: ['gidNumber', 'loginShell', 'homeDirectory', 'uidNumber', 'name']
 ```
 
-Fix this by logging in as a real user (someone with actual Linux credentials) and making sure that `CRAY_CREDENTIALS` is unset.
+Fix this by logging in as a Keycloak user with the above attributes defined using `cray auth login`, and make sure that `CRAY_CREDENTIALS` is unset.
 
 #### 6.4.2 UAS cannot access Keycloak
 

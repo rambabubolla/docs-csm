@@ -15,8 +15,7 @@ procedure entails deactivating the LiveCD, meaning the LiveCD and all of its res
    1. [Backup](#33-backup)
 1. [Reboot](#4-reboot)
 1. [Enable NCN disk wiping safeguard](#5-enable-ncn-disk-wiping-safeguard)
-1. [Remove the default NTP pool](#6-remove-the-default-ntp-pool)
-1. [Configure DNS and NTP on each BMC](#7-configure-dns-and-ntp-on-each-bmc)
+1. [Configure DNS and NTP on each BMC](#6-configure-dns-and-ntp-on-each-bmc)
 1. [Next topic](#8-next-topic)
 
 ## 1. Required services
@@ -87,25 +86,33 @@ The steps in this section load hand-off data before a later procedure reboots th
 
 1. (`pit#`) Upload NCN boot artifacts into S3.
 
-    ```bash
-    set -o pipefail
-    kubernetes_rootfs="$(readlink -f /var/www/ncn-m002/rootfs)" &&
-    kubernetes_initrd="$(readlink -f /var/www/ncn-m002/initrd.img.xz)"  &&
-    kubernetes_kernel="$(readlink -f /var/www/ncn-m002/kernel)"  &&
-    kubernetes_version="$(basename ${kubernetes_rootfs} .squashfs | awk -F '-' '{print $NF}')" &&
-    ceph_rootfs="$(readlink -f /var/www/ncn-s001/rootfs)" &&
-    ceph_initrd="$(readlink -f /var/www/ncn-s001/initrd.img.xz)" &&
-    ceph_kernel="$(readlink -f /var/www/ncn-s001/kernel)" &&
-    ceph_version="$(basename ${ceph_rootfs} .squashfs | awk -F '-' '{print $NF}')" &&
-    cray artifacts create boot-images "k8s/${kubernetes_version}/rootfs" "${kubernetes_rootfs}" &&
-    cray artifacts create boot-images "k8s/${kubernetes_version}/initrd" "${kubernetes_initrd}" &&
-    cray artifacts create boot-images "k8s/${kubernetes_version}/kernel" "${kubernetes_kernel}" &&
-    cray artifacts create boot-images "ceph/${ceph_version}/rootfs" "${ceph_rootfs}" &&
-    cray artifacts create boot-images "ceph/${ceph_version}/initrd" "${ceph_initrd}" &&
-    cray artifacts create boot-images "ceph/${ceph_version}/kernel" "${ceph_kernel}" && echo SUCCESS
-    ```
+    1. Upload Kubernetes NCN artifacts.
 
-    Ensure that the output from the above command chain ends with `SUCCESS`.
+        ```bash
+        set -o pipefail
+        IMS_UPLOAD_SCRIPT=$(rpm -ql docs-csm | grep ncn-ims-image-upload.sh) &&
+            export IMS_ROOTFS_FILENAME="$(readlink -f /var/www/ncn-m002/rootfs)" &&
+            export IMS_INITRD_FILENAME="$(readlink -f /var/www/ncn-m002/initrd.img.xz)"  &&
+            export IMS_KERNEL_FILENAME="$(readlink -f /var/www/ncn-m002/kernel)"  &&
+            K8S_IMS_IMAGE_ID=$($IMS_UPLOAD_SCRIPT) &&
+            [[ -n ${K8S_IMS_IMAGE_ID} ]] &&
+            echo -e "Kubernetes NCN image IMS ID: ${K8S_IMS_IMAGE_ID}\nSUCCESS"
+        ```
+
+        Ensure that the output from the above command chain ends with `SUCCESS`.
+
+    1. Upload Storage NCN artifacts.
+
+        ```bash
+        export IMS_ROOTFS_FILENAME="$(readlink -f /var/www/ncn-s001/rootfs)" &&
+            export IMS_INITRD_FILENAME="$(readlink -f /var/www/ncn-s001/initrd.img.xz)" &&
+            export IMS_KERNEL_FILENAME="$(readlink -f /var/www/ncn-s001/kernel)" &&
+            STORAGE_IMS_IMAGE_ID=$($IMS_UPLOAD_SCRIPT) &&
+            [[ -n ${STORAGE_IMS_IMAGE_ID} ]] &&
+            echo -e "Storage NCN image IMS ID: ${STORAGE_IMS_IMAGE_ID}\nSUCCESS"
+        ```
+
+        Ensure that the output from the above command chain ends with `SUCCESS`.
 
 1. (`pit#`) Get a token to use for authenticated communication with the gateway.
 
@@ -122,13 +129,13 @@ The steps in this section load hand-off data before a later procedure reboots th
     > **`NOTE`** This step will prompt for the root password of the NCNs.
 
     ```bash
-    kubernetes_rootfs="$(readlink -f /var/www/ncn-m002/rootfs)" &&
-    ceph_rootfs="$(readlink -f /var/www/ncn-s001/rootfs)" &&
     csi handoff bss-metadata \
         --data-file "${PITDATA}/configs/data.json" \
-        --kubernetes-file "${kubernetes_rootfs}" \
-        --storage-ceph-file "${ceph_rootfs}" && echo SUCCESS
+        --kubernetes-ims-image-id "$K8S_IMS_IMAGE_ID}" \
+        --storage-ims-image-id "$STORAGE_IMS_IMAGE_ID" && echo SUCCESS
     ```
+
+    Ensure that the output from the above command chain ends with `SUCCESS`.
 
 1. (`pit#`) Patch the metadata for the Ceph nodes to have the correct run commands.
 
@@ -319,7 +326,7 @@ It is important to backup some files from `ncn-m001` before it is rebooted.
 1. (`ncn-m001#`) Restore and verify the site link.
 
     Restore networking files from the manual backup taken during the
-    [Backup](#32-backup) step.
+    [Backup](#33-backup) step.
 
     ```bash
     SYSTEM_NAME=eniac
@@ -425,15 +432,7 @@ it is used for Cray installation and bootstrap.
     /tmp/csi handoff bss-update-param --set metal.no-wipe=1
     ```
 
-## 6. Remove the default NTP pool
-
-(`ncn-m001#`) Run the following command to remove the default pool, in order to prevent contention issues with NTP.
-
-```bash
-sed -i "s/^! pool pool\.ntp\.org.*//" /etc/chrony.conf
-```
-
-## 7. Configure DNS and NTP on each BMC
+## 6. Configure DNS and NTP on each BMC
 
  > **`NOTE`** Only follow this section if the NCNs are HPE hardware. If the system uses
  > Gigabyte or Intel hardware, then skip this section.
@@ -444,7 +443,7 @@ However, the commands in this section are all run **on** `ncn-m001`.
 1. (`ncn-m001#`) Validate that the system is HPE hardware.
 
     ```bash
-    ipmitool mc info | grep "Hewlett Packard Enterprise" || echo "Not HPE hardware -- SKIP these steps"
+    ipmitool mc info | grep "Hewlett Packard Enterprise" || echo "Not HPE hardware -- SKIP this section"
     ```
 
 1. (`ncn-m001#`) Set environment variables.

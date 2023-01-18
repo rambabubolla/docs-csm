@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -33,24 +33,42 @@ dryRun=false
 baseUrl="https://api-gw-service-nmn.local"
 retry=true
 force=false
+upgrade=false
+rebuild=false
+zapOsds=false
+workflowType=""
 
 function usage() {
     echo "CSM ncn worker and storage upgrade script"
     echo
-    echo "Syntax: /usr/share/doc/csm/upgrade/scripts/upgrade/ncn-upgrade-worker-storage-nodes.sh [COMMA_SEPARATED_NCN_HOSTNAMES] [-f|--force|--retry|--base-url|--dry-run]"
+    echo "Syntax: /usr/share/doc/csm/upgrade/scripts/upgrade/ncn-upgrade-worker-storage-nodes.sh [COMMA_SEPARATED_NCN_HOSTNAMES] [-f|--force|--retry|--base-url|--dry-run|--upgrade|--rebuild]"
     echo "options:"
     echo "--no-retry     Do not automatically retry  (default: false)"
     echo "-f|--force     Remove failed worker or storage rebuild/upgrade workflow and create a new one  (default: ${force})"
     echo "--base-url     Specify base url (default: ${baseUrl})"
     echo "--dry-run      Print out steps of workflow instead of running steps (default: ${dryRun})"
+    echo "--upgrade      Perfrom a node upgrade. This only needs to be specified when upgrading storage nodes."
+    echo "--rebuild      Perfrom a node rebuild. This only needs to be specified when rebuilding storage nodes"
+    echo "--zap-osds     Zap osds. Only do this if unable to wipe the node prior to rebuild. For example, when a storage node unintentionally goes down and needs to be rebuilt. (This can only be used with storage rebuilds)."
     echo
     echo "*COMMA_SEPARATED_NCN_HOSTNAMES"
     echo "  worker upgrade  - example 1) ncn-w001"
     echo "  worker upgrade  - example 2) ncn-w001,ncn-w002,ncn-w003"
-    echo "  storage upgrade - example 3) ncn-s001"
-    echo "  storage upgrade - example 4) ncn-s001,ncn-s002,ncn-s003"
+    echo "  storage upgrade - example 3) ncn-s001 --upgrade"
+    echo "  storage upgrade - example 4) ncn-s001,ncn-s002,ncn-s003 --upgrade"
+    echo "  storage rebuild - example 5) ncn-s001 --rebuild"
+    echo "  storage rebuild - example 6) ncn-s001,ncn-s002,ncn-s003 --rebuild"
     echo
 }
+
+# Warn when passing in extra arguments that probably were intended to be comma
+# separated hosts to upgrade, should fix this script to just accept all args
+# after the first however
+function argerr() {
+  printf "Extra arguments %s present after arg parsing, did you intend these to be in the comma separated host list instead?\n\n" "$*">&2
+}
+
+terminal=false
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -71,23 +89,49 @@ while [[ $# -gt 0 ]]; do
         dryRun=true
         shift # past argument
         ;;
-    ncn-w[0-9][0-9][0-9]*)
-        target_ncns=$1
+    --upgrade)
+        upgrade=true
         shift # past argument
-        IFS=', ' read -r -a array <<< "$target_ncns"
-        jsonArray=$(jq -r --compact-output --null-input '$ARGS.positional' --args -- "${array[@]}")
-        nodeType="worker"
+        ;;
+    --rebuild)
+        rebuild=true
+        shift # past argument
+        ;;
+    --zap-osds)
+        zapOsds=true
+        shift # past argument
+        ;;
+    ncn-w[0-9][0-9][0-9]*)
+        if $terminal; then
+          argerr "$@"
+          usage
+          exit 1
+        else
+          target_ncns=$1
+          shift # past argument
+          IFS=', ' read -r -a array <<< "$target_ncns"
+          jsonArray=$(jq -r --compact-output --null-input '$ARGS.positional' --args -- "${array[@]}")
+          nodeType="worker"
+        fi
+        terminal=true
         ;;
     ncn-s[0-9][0-9][0-9]*)
-        target_ncns=$1
-        shift # past argument
-        IFS=', ' read -r -a array <<< "$target_ncns"
-        jsonArray=$(jq -r --compact-output --null-input '$ARGS.positional' --args -- "${array[@]}")
-        nodeType="storage"
+        if $terminal; then
+          argerr "$@"
+          usage
+          exit 1
+        else
+          target_ncns=$1
+          shift # past argument
+          IFS=', ' read -r -a array <<< "$target_ncns"
+          jsonArray=$(jq -r --compact-output --null-input '$ARGS.positional' --args -- "${array[@]}")
+          nodeType="storage"
+        fi
+        terminal=true
         ;;
     *)
-        echo 
-        echo "Unknown option $1" 
+        echo
+        echo "Unknown option $1"
         usage
         exit 1
         ;;
@@ -99,8 +143,23 @@ if $retry && $force; then
     retry=false
 fi
 
+if [[ $nodeType == "storage" ]]; then
+    if $upgrade; then 
+        workflowType="upgrade"
+    elif $rebuild; then
+        workflowType="rebuild"
+    else
+        echo "Input Error: when rebuilding or upgrading storage nodes, the '--rebuild' or '--upgrade' flag needs to specified."
+        exit 1
+    fi
+    if $upgrade && $rebuild; then
+        echo "Input Error: cannot use both '--rebuild' and '--upgrade' flag at the same time."
+        exit 1
+    fi
+fi
+
 function uploadWorkflowTemplates() {
-    "${basedir}"/../../../workflows/scripts/upload-worker-rebuild-templates.sh
+    "${basedir}"/../../../workflows/scripts/upload-rebuild-templates.sh
 }
 
 function createWorkflowPayload() {
@@ -125,7 +184,9 @@ EOF
         cat << EOF
 {
 "dryRun": ${dryRun},
-"hosts": ${jsonArray}
+"hosts": ${jsonArray},
+"zapOsds": ${zapOsds},
+"workflowType": "${workflowType}"
 }
 EOF
     fi
@@ -242,8 +303,12 @@ sleep 20
 while true; do
     labelSelector="node-type=${nodeType}"
     res_file="$(mktemp)"
-    http_status=$(curl -s -o "${res_file}" -w "%{http_code}" -k -XGET -H "Authorization: Bearer $(getToken)" "${baseUrl}/apis/nls/v1/workflows?labelSelector=${labelSelector}")
-    
+    # Retry the curl command if it fails
+    while ! http_status=$(curl -s -o "${res_file}" -w "%{http_code}" -k -XGET -H "Authorization: Bearer $(getToken)" "${baseUrl}/apis/nls/v1/workflows?labelSelector=${labelSelector}") ; do
+        echo "WARNING: curl call to ${baseUrl}/apis/nls/v1/workflows?labelSelector=${labelSelector} failed. Retrying after 10 seconds"
+        sleep 10
+    done
+
     if [ "${http_status}" -eq 200 ]; then
         phase=$(jq -r ".[] | select(.name==\"${workflow}\") | .status.phase" < "${res_file}")
         # skip null because workflow hasn't started yet

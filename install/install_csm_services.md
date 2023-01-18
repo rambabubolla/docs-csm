@@ -7,10 +7,10 @@ This procedure will install CSM applications and services into the CSM Kubernete
 1. [Install CSM services](#1-install-csm-services)
 1. [Create base BSS global boot parameters](#2-create-base-bss-global-boot-parameters)
 1. [Wait for everything to settle](#3-wait-for-everything-to-settle)
-
-* [Known issues](#known-issues)
-  * [`Deploy CSM Applications and Services` known issues](#deploy-csm-applications-and-services-known-issues)
-  * [`Setup Nexus` known issues](#setup-nexus-known-issues)
+1. [Next topic](#next-topic)
+1. [Known issues](#known-issues)
+  1. [`Deploy CSM Applications and Services` known issues](#deploy-csm-applications-and-services-known-issues)
+  1. [`Setup Nexus` known issues](#setup-nexus-known-issues)
 
 ## 1. Install CSM services
 
@@ -43,6 +43,7 @@ This procedure will install CSM applications and services into the CSM Kubernete
    >   the `--console-output execute` argument to the `yapl` command.
    > * The `yapl` command can safely be rerun. By default, it will skip any steps which were previously completed successfully. To force it to
    >   rerun all steps regardless of what was previously completed, append the `--no-cache` argument to the `yapl` command.
+   > * The order of the `yapl` command arguments is important. The syntax is `yapl -f install.yaml [--console-output] execute [--no-cache]`.
 
 ## 2. Create base BSS global boot parameters
 
@@ -100,7 +101,19 @@ This procedure will install CSM applications and services into the CSM Kubernete
 Wait **at least 15 minutes** to let the various Kubernetes resources initialize and start before proceeding with the rest of the install.
 Because there are a number of dependencies between them, some services are not expected to work immediately after the install script completes.
 
+1. After having waited until services are healthy (run `kubectl get po -A | grep -v 'Completed\|Running'` to see which pods may still be `Pending`), take a manual backup of all Etcd clusters.
+These clusters are automatically backed up every 24 hours, but not until the clusters have been up that long.
+Taking a manual backup enables restoring from backup later in this install process if needed.
+
+   ```bash
+   /usr/share/doc/csm/scripts/operations/etcd/take-etcd-manual-backups.sh post_install
+   ```
+
 1. The next step is to validate CSM health before redeploying the final NCN. See [Validate CSM health before final NCN deployment](./README.md#3-validate-csm-health-before-final-ncn-deployment).
+
+## Next Topic
+
+After installing CSM, proceed to [validate CSM health before final NCN deployment](./README.md#3-validate-csm-health-before-final-ncn-deployment).
 
 ## Known issues
 

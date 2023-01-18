@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2022-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -230,9 +230,10 @@ if __name__ == '__main__':
       slsnetworks = get_sls_networks(ADMIN_SECRET, SYSTEM_DOMAIN, svcs['test-networks'])
       if "can" in slsnetworks:
         USER_NET = "can"
-      if "chn" in slsnetworks:
-        USER_NET = "chn"
-    reachnets.append(USER_NET)
+#      CASMINST-5647: removing CHN test from 1.3 until test case can be redesigned.
+#      if "chn" in slsnetworks:
+#        USER_NET = "chn"
+        reachnets.append(USER_NET)
 
     if NODE_TYPE == "ncn":
       reachnets.append("nmnlb")
@@ -334,11 +335,7 @@ if __name__ == '__main__':
                   continue
 
           if net['gateway'] not in svcgws:
-            # HMNLB behaves differently than other networks right now (CASMPET-5853)
-            if netname == "hmnlb":
-              svcexp = 403
-            else:
-              svcexp = 404
+            svcexp = 404
           # if the token we have does not match the network we are testing, we expect a 403
           # CMN tokens will work with NMN and vice versa, because they are using the same gateway in 1.2.
           elif tokname == "cmn" and netname != tokname and netname != "nmnlb":
@@ -372,4 +369,3 @@ if __name__ == '__main__':
         print("\nOverall Gateway Test Status:  PASS")
 
     sys.exit(TEST_FAILED)
-

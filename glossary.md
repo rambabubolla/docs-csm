@@ -2,69 +2,68 @@
 
 Glossary of terms used in CSM documentation.
 
-* [Application Node (AN)](#application-node)
-* [Baseboard Management Controller (BMC)](#baseboard-management-controller)
-* [Blade Switch Controller (sC)](#blade-switch-controller)
-* [Boot Script Service (BSS)](#boot-script-service)
-* [Boot Orchestration Service (BOS)](#boot-orchestration-service)
+* [Application Node (AN)](#application-node-an)
+* [Baseboard Management Controller (BMC)](#baseboard-management-controller-bmc)
+* [Blade Switch Controller (sC)](#blade-switch-controller-sc)
+* [Boot Script Service (BSS)](#boot-script-service-bss)
+* [Boot Orchestration Service (BOS)](#boot-orchestration-service-bos)
 * [Cabinet Cooling Group](#cabinet-cooling-group)
-* [Cabinet Environmental Controller (CEC)](#cabinet-environmental-controller)
-* [CEC microcontroller (eC)](#cec-microcontroller)
-* [Compute Rolling Upgrade Service (CRUS)](#compute-rolling-upgrade-service)
-* [Cray Advanced Platform Monitoring and Control (CAPMC)](#cray-advanced-platform-monitoring-and-control)
+* [Cabinet Environmental Controller (CEC)](#cabinet-environmental-controller-cec)
+* [CEC microcontroller (eC)](#cec-microcontroller-ec)
+* [Compute Rolling Upgrade Service (CRUS)](#compute-rolling-upgrade-service-crus)
+* [Cray Advanced Platform Monitoring and Control (CAPMC)](#cray-advanced-platform-monitoring-and-control-capmc)
 * [Customer Access Network](#customer-access-network)
-* [Chassis Management Module (CMM)](#chassis-management-module)
-* [Compute Node (CN)](#compute-node)
-* [Configuration Framework Service (CFS)](#configuration-framework-service)
-* [Content Projection Service (CPS)](#content-projection-service)
-* [Cray CLI (`cray`)](#cray-cli)
-* [Cray Site Init (CSI)](#cray-site-init)
-* [Cray System Management (CSM)](#cray-system-management)
-* [Data Virtualization Service (DVS)](#data-virtualization-service)
+* [Chassis Management Module (CMM)](#chassis-management-module-cmm)
+* [Compute Node (CN)](#compute-node-cn)
+* [Configuration Framework Service (CFS)](#configuration-framework-service-cfs)
+* [Content Projection Service (CPS)](#content-projection-service-cps)
+* [Cray CLI (`cray`)](#cray-cli-cray)
+* [Cray Site Init (CSI)](#cray-site-init-csi)
+* [Cray System Management (CSM)](#cray-system-management-csm)
+* [Data Virtualization Service (DVS)](#data-virtualization-service-dvs)
 * [EX Compute Cabinet](#ex-compute-cabinet)
 * [EX TDS Cabinet](#ex-tds-cabinet)
 * [Fabric](#fabric)
 * [Floor Standing CDU](#floor-standing-cdu)
-* [Hardware Management Network (HMN)](#hardware-management-network)
-* [Hardware Management Notification Fanout Daemon (HMNFD)](#hardware-management-notification-fanout-daemon)
-* [Hardware State Manager (HSM)](#hardware-state-manager)
-* [Heartbeat Tracker Daemon (HBTD)](#heartbeat-tracker-daemon)
-* [High Speed Network (HSN)](#high-speed-network)
-* [Image Management Service (IMS)](#image-management-service)
-* [Kubernetes NCNs](#kubernetes-ncns)
-* [LiveCD](#livecd)
-* [Management Cabinet](#management-cabinet)
+* [Hardware Management Network (HMN)](#hardware-management-network-hmn)
+* [Hardware Management Notification Fanout Daemon (HMNFD)](#hardware-management-notification-fanout-daemon-hmnfd)
+* [Hardware State Manager (HSM)](#hardware-state-manager-hsm)
+* [Heartbeat Tracker Daemon (HBTD)](#heartbeat-tracker-daemon-hbtd)
+* [High Speed Network (HSN)](#high-speed-network-hsn)
+* [Image Management Service (IMS)](#image-management-service-ims)
 * [Management Nodes](#management-nodes)
-* [Mountain Endpoint Discovery Service (MEDS)](#mountain-endpoint-discovery-service)
-* [NIC Mezzanine Card (NMC)](#nic-mezzanine-card)
-* [Node Controller (nC)](#node-controller)
+* [Mountain Endpoint Discovery Service (MEDS)](#mountain-endpoint-discovery-service-meds)
+* [NIC Mezzanine Card (NMC)](#nic-mezzanine-card-nmc)
+* [Node Controller (nC)](#node-controller-nc)
 * [Node Management Network](#node-management-network)
-* [Non-Compute Node (NCN)](#non-compute-node)
+* [Non-Compute Node (NCN)](#non-compute-node-ncn)
 * [Olympus Cabinet](#olympus-cabinet)
-* [Power Distribution Unit (PDU)](#power-distribution-unit)
-* [Pre-Install Toolkit (PIT) node](#pre-install-toolkit-node)
+* [Power Distribution Unit (PDU)](#power-distribution-unit-pdu)
+* [Pre-Install Toolkit (PIT) node](#pre-install-toolkit-pit)
+  * [LiveCD](#livecd)
+  * [RemoteISO](#remoteiso)
 * [Rack-Mounted CDU](#rack-mounted-cdu)
 * [Rack System Compute Cabinet](#rack-system-compute-cabinet)
-* [Redfish Translation Service (RTS)](#redfish-translation-service)
+* [Redfish Translation Service (RTS)](#redfish-translation-service-rts)
 * [River Cabinet](#river-cabinet)
-* [River Endpoint Discovery Service (REDS)](#river-endpoint-discovery-service)
+* [River Endpoint Discovery Service (REDS)](#river-endpoint-discovery-service-reds)
 * [Rosetta ASIC](#rosetta-asic)
-* [Service/IO Cabinet](#service-io-cabinet)
+* [Service/IO Cabinet](#serviceio-cabinet)
 * [Slingshot](#slingshot)
 * [Slingshot Blade Switch](#slingshot-blade-switch)
-* [Slingshot Top of Rack (ToR) Switch](#slingshot-top-of-rack-switch)
-* [Shasta Cabling Diagram (SHCD)](#shasta-cabling-diagram)
-* [Supply/Return Cutoff Valves](#supply-return-cutoff-valves)
-* [System Admin Toolkit (SAT)](#system-admin-toolkit)
-* [System Layout Service (SLS)](#system-layout-service)
-* [System Management Network (SMNet)](#system-management-network)
+* [Slingshot Top of Rack (ToR) Switch](#slingshot-top-of-rack-tor-switch)
+* [Shasta Cabling Diagram (SHCD)](#shasta-cabling-diagram-shcd)
+* [Supply/Return Cutoff Valves](#supplyreturn-cutoff-valves)
+* [System Admin Toolkit (SAT)](#system-admin-toolkit-sat)
+* [System Layout Service (SLS)](#system-layout-service-sls)
+* [System Management Network (SMNet)](#system-management-network-smnet)
 * [System Management Services (SMS)](#system-management-services-sms)
-* [System Management Services (SMS) nodes](#system-management-services-nodes)
-* [Top of Rack Switch Controller (sC-ToR)](#top-of-rack-switch-controller)
-* [User Access Instance (UAI)](#user-access-instance)
-* [User Access Node (UAN)](#user-access-node)
-* [User Access Service (UAS)](#user-access-service)
-* [Version Control Service (VCS)](#version-control-service)
+* [System Management Services (SMS) nodes](#system-management-services-sms-nodes)
+* [Top of Rack Switch Controller (sC-ToR)](#top-of-rack-switch-controller-sc-tor)
+* [User Access Instance (UAI)](#user-access-instance-uai)
+* [User Access Node (UAN)](#user-access-node-uan)
+* [User Access Service (UAS)](#user-access-service-uas)
+* [Version Control Service (VCS)](#version-control-service-vcs)
 * [xname](#xname)
 
 ## Application Node (AN)
@@ -100,9 +99,8 @@ component. Nodes consult BSS for their boot artifacts and boot parameters when n
 
 The Boot Orchestration Service (BOS) is responsible for booting, configuring, and shutting down
 collections of nodes. This is accomplished using BOS components, such as boot orchestration session
-templates and sessions, as well as launching a Boot Orchestration Agent (BOA) that fulfills boot
-requests. BOS uses other services which provide boot artifact configuration (BSS), power control
-(CAPMC), node status (HSM), and configuration (CFS).
+templates and sessions. BOS uses other services which provide boot artifact configuration (BSS),
+power control (CAPMC), node status (HSM), and configuration (CFS).
 
 ## Cabinet Cooling Group
 
@@ -139,7 +137,7 @@ management status of nodes, handling each of the steps required to upgrade compu
 See [Compute Rolling Upgrades](operations/index.md#compute-rolling-upgrades).
 
 > **`NOTE`** CRUS was deprecated in CSM 1.2.0. It will be removed in a future CSM release and replaced with BOS V2, which will provide similar functionality. See
-[Deprecated features](introduction/differences.md#deprecated_features).
+[Deprecated features](introduction/differences.md#deprecated-features).
 
 ## Cray Advanced Platform Monitoring and Control (CAPMC)
 
@@ -298,35 +296,16 @@ It tracks changes in heartbeats and conveys changes to HSM.
 
 The High Speed Network (HSN) in an HPE Cray EX system is based on the Slingshot switches.
 
-## Kubernetes NCNs
-
-The Kubernetes NCNs are the management nodes which are known as Kubernetes master nodes
-(`ncn-mXXX`) or Kubernetes worker nodes (`ncn-wXXX`). The only type of management node which is
-excluded from this is the utility storage node (`ncn-sXXX`).
-
-## LiveCD
-
-The LiveCD has a complete bootable Linux operating system that can be run from a read-only CD or
-DVD, a writable USB flash drive, or a hard disk. It is used to bootstrap the installation
-process for CSM software. It contains the Pre-Install Toolkit (PIT). The node which boots
-from it during the install is known as the [PIT node](#pre-install-toolkit-node).
-
-## Management Cabinet
-
-At least one 19 inch IEA management cabinet is required for every HPE Cray EX system to
-support the management non-compute nodes (NCN), system management network, utility
-storage, and other support equipment. This cabinet serves as the primary customer access
-point for managing the system.
-
 ## Management Nodes
 
-The management nodes are one grouping of NCNs. The management nodes include the master nodes
-with hostnames of the form of `ncn-mXXX`, the worker nodes with hostnames of the form `ncn-wXXX`,
-and utility storage nodes, with hostnames of the form `ncn-sXXX`, where the `XXX` is a three
-digit number starting with zero padding. The utility storage nodes provide Ceph storage for use
-by the management nodes. The master nodes provide Kubernetes master functions and have the
-etcd cluster which provides a datastore for Kubernetes. The worker nodes provide Kubernetes
-worker functions where most of the containerized workload is scheduled by Kubernetes.
+The management nodes refer to [non-compute nodes (NCNs)](#non-compute-node-ncn). Management nodes
+provide containerization services as well as storage classes.
+
+The management nodes have various roles:
+
+- masters nodes are Kubernetes masters 
+- worker nodes are Kubernetes workers and have physical connections to the [high-speed network](#high-speed-network-hsn)
+- storage nodes physically have more local storage for providing storage classes to Kubernetes
 
 ## Mountain Cabinet
 
@@ -362,8 +341,8 @@ general access to management REST APIs.
 
 ## Non-Compute Node (NCN)
 
-Any node which is not a compute node may be called a Non-Compute Node (NCN). The NCNs include
-management nodes and application nodes.
+The non-compute nodes are in the management-plane, these nodes serve infrastructure for microservices
+(e.g. Kubernetes and storage classes).
 
 ## Olympus Cabinet
 
@@ -381,18 +360,27 @@ provides circuit breaker, fuse protection, and EMI filtered power to the rectifi
 supplies that distribute ±190VDC (HVDC) to a chassis. PDUs are passive devices that do
 not connect to the SMNet.
 
-## Pre-Install Toolkit (PIT) node
+## Pre-Install Toolkit (PIT)
 
-The Pre-Install Toolkit is installed onto the initial node used as the inception node during software
-installation which is booted from a [LiveCD](#livecd). This is the node that will eventually become `ncn-m001`.
-The node running the Pre-Install Toolkit is known as the PIT node during the installation process
-until it reboots from a normal management node image like the other master nodes.
+The Pre-Install Toolkit (PIT), also known as the *Cray Pre-Install Toolkit"*, provides a framework installing [Cray Systems Management](#cray-system-management-csm).
+The PIT can be used on any node in the system for recovery and bare-metal discovery, the PIT includes tooling
+for recovering any [non-compute nodes](#non-compute-node-ncn), and can remotely recover other [NCNs](#non-compute-node-ncn).
 
-Early in the install process, before the Pre-Install Toolkit has been installed or booted, the
-documents may still refer to the PIT node. In this case, they are referring to the node which
-will eventually become the PIT node.
+Regarding [CSM](#cray-system-management-csm) installations, typically the first Kubernetes master (`ncn-m001`) is chosen for
+running the PIT during a [CSM](#cray-system-management-csm) installation. After [CSM](#cray-system-management-csm) is installed,
+the node running the PIT will be rebooted and deployed via [CSM](#cray-system-management-csm) services before finally joining
+the running Kubernetes cluster.
 
-In this documentation, PIT node and LiveCD are sometimes used interchangeably.
+The PIT is delivered as a [LiveCD](#livecd), a disk image that can be used to remotely boot a node (e.g. a [RemoteISO](#remoteiso)) or by a USB stick.
+
+### LiveCD
+
+The term *LiveCD* refers to the artifact, the literal image file that contains the pre-install toolkit.
+
+### RemoteISO
+
+The term *RemoteISO* refers to a [LiveCD](#livecd) that is remotely mounted on a server. A remotely mounted LiveCD has no persistence,
+a reboot of a RemoteISO will lose all data/information from the running session.
 
 ## Rack-Mounted CDU
 
@@ -412,9 +400,9 @@ Redfish, such as a ServerTech PDU in a River Cabinet.
 ## River Cabinet
 
 At least one 19 inch IEA management cabinet is required for every HPE Cray EX system to
-support the management non-compute nodes (NCN), system management network, utility
-storage, and other support equipment. Additional River cabinets may be included to
-house storage storage or compute nodes which are not in an Olympus liquid-cooled cabinet.
+support the [management nodes](#management-nodes), system management network, utility
+storage, and other support equipment. This cabinet serves as the primary customer access
+point for managing the system.
 
 ## River Endpoint Discovery Service (REDS)
 

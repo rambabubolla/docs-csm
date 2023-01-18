@@ -2,9 +2,9 @@
 
 This procedure redeploys S3 and `sysmgmt-health` services to add or remove storage node endpoints.
 
-**This procedure can be skipped if a worker or master node has been added.** In that case, proceed to the next step to [Validate NCN](Validate_NCN.md) or return to the main [Add, Remove, Replace, or Move NCNs](../Add_Remove_Replace_NCNs.md) page.
+**This procedure can be skipped if a worker or master node has been added.** In that case, proceed to the next step to [Validate NCN](Validate_NCN.md) or return to the main [Add, Remove, Replace, or Move NCNs](Add_Remove_Replace_NCNs.md) page.
 
-**This procedure can be skipped if a worker or master node have been removed.** In that case, proceed to the next step to [Validate Health](Validate_Health.md) or return to the main [Add, Remove, Replace, or Move NCNs](../Add_Remove_Replace_NCNs.md) page.
+**This procedure can be skipped if a worker or master node have been removed.** In that case, proceed to the next step to [Validate Health](Validate_Health.md) or return to the main [Add, Remove, Replace, or Move NCNs](Add_Remove_Replace_NCNs.md) page.
 
 Otherwise, if a storage node has been added or removed, proceed with the following steps.
 
@@ -24,7 +24,7 @@ Update the `nmn_ncn_storage` list to include the IP addresses for any added or r
 
 Before redeploying the desired charts, update the `customizations.yaml` file in the `site-init` secret in the `loftsman` namespace.
 
-1. If the `site-init` repository is available as a remote repository [as described here](../../../install/prepare_site_init.md#push-to-a-remote-repository), then clone it to `ncn-m001`. Otherwise, ensure that the `site-init` repository is available on `ncn-m001`.
+1. If the `site-init` repository is available as a remote repository, then clone it to `ncn-m001`. Otherwise, ensure that the `site-init` repository is available on `ncn-m001`.
 
    ```bash
    git clone "$SITE_INIT_REPO_URL" site-init
@@ -275,5 +275,5 @@ rm /tmp/customizations.yaml /tmp/customizations.original.yaml /tmp/customization
 
 Proceed to the next step:
 
-- If a storage NCN was added, proceed to [Validate NCN](Validate_NCN.md) or return to the main [Add, Remove, Replace, or Move NCNs](../Add_Remove_Replace_NCNs.md) page.
-- If a storage NCN was removed, proceed to [Validate Health](Validate_Health.md) or return to the main [Add, Remove, Replace, or Move NCNs](../Add_Remove_Replace_NCNs.md) page.
+- If a storage NCN was added, proceed to [Validate NCN](Validate_NCN.md) or return to the main [Add, Remove, Replace, or Move NCNs](Add_Remove_Replace_NCNs.md) page.
+- If a storage NCN was removed, proceed to [Validate Health](Validate_Health.md) or return to the main [Add, Remove, Replace, or Move NCNs](Add_Remove_Replace_NCNs.md) page.

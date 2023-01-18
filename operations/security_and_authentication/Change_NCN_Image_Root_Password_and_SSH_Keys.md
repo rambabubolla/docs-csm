@@ -14,7 +14,7 @@ All of the commands in this procedure are intended to be run on a single master 
 
 - This procedure can only be done after the PIT node is rebuilt to become a normal master node.
 - The Cray CLI must be configured on the node where the procedure is being done. See [Configure the Cray Command Line Interface](../configure_cray_cli.md).
-- The CSM documentation RPM must be installed on the node where the procedure is being run. See [Check for Latest Documentation](../../update_product_stream/README.md#documentation).
+- The CSM documentation RPM must be installed on the node where the procedure is being run. See [Check for Latest Documentation](../../update_product_stream/README.md#check-for-latest-documentation).
 
 ## Procedure
 
@@ -30,12 +30,12 @@ All of the commands in this procedure are intended to be run on a single master 
       - [Enter password and generate hash](#enter-password-and-generate-hash)
     - [Timezone](#timezone)
     - [Examples](#examples)
-      - [Example 1: New keys, copy password, keep UTC](#example-1-new-keys-copy-password-keep-utc)
-      - [Example 2: Provide keys, prompt for password, change timezone](#example-2-provide-keys-prompt-for-password-change-timezone)
-      - [Example 3: New keys, no password change, keep UTC, no prompting](#example-3-new-keys-no-password-change-keep-utc-no-prompting)
+      - [Example 1: New keys, copy password, keep UTC](#example-1--new-keys-copy-password-keep-utc)
+      - [Example 2: Provide keys, prompt for password, change timezone](#example-2--provide-keys-prompt-for-password-change-timezone)
+      - [Example 3: New keys, no password change, keep UTC, no prompting](#example-3--new-keys-no-password-change-keep-utc-no-prompting)
 
 1. [Upload artifacts into S3](#4-upload-artifacts-into-s3)
-1. [Update BSS](#update-bss)
+1. [Update BSS](#5-update-bss)
 1. [Cleanup](#6-cleanup)
 1. [Rebuild NCNs](#7-rebuild-ncns)
 
@@ -172,7 +172,7 @@ To have the script generate the SSH keys automatically, it must be provided with
 - To view the complete list of supported `ssh-keygen` options, view the script usage statement by running it with the `-h` argument.
 - If the `-N` option is not used to specify the passphrase, then the script will prompt for the passphrase when it generates the keys.
   - Even specifying an empty passphrase will prevent being prompted to enter the passphrase during script execution.
-    See [Example 3](#example-3-new-keys-copy-password-keep-utc-no-prompting).
+    See [Example 3](#example-3--new-keys-no-password-change-keep-utc-no-prompting).
 
 ##### Administrator-provided keys
 
@@ -218,7 +218,7 @@ else
     if [[ ${PW1} != ${PW2} ]]; then
         echo "ERROR: Passwords do not match"
     else
-        export SQUASHFS_ROOT_PW_HASH=$(echo -n "${PW1}" | openssl passwd -6 -salt $(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c4) --stdin)
+        export SQUASHFS_ROOT_PW_HASH=$(echo -n "${PW1}" | openssl passwd -6 -salt $(< /dev/urandom tr -dc ./A-Za-z0-9 | head -c4) --stdin)
         [[ -n ${SQUASHFS_ROOT_PW_HASH} ]] && echo "Password hash set and exported" || echo "ERROR: Problem generating hash"
     fi
 fi ; unset PW1 PW2
@@ -275,40 +275,28 @@ $NCN_MOD_SCRIPT -t rsa \
 1. (`ncn-mw#`) Upload the new Kubernetes image into S3.
 
     ```bash
-    /usr/share/doc/csm/scripts/ceph-upload-file-public-read.py \
-        --bucket-name ncn-images \
-        --key-name "k8s/${K8SNEW}/filesystem.squashfs" \
-        --file-name k8s/${K8SVERSION}/secure-filesystem.squashfs
+    cray artifacts create boot-images k8s/${K8SNEW}/filesystem.squashfs k8s/${K8SVERSION}/secure-filesystem.squashfs
     ```
 
 1. (`ncn-mw#`) Upload the Kubernetes kernel and `initrd` into S3 under the new version string.
 
     ```bash
     for art in initrd kernel ; do
-        /usr/share/doc/csm/scripts/ceph-upload-file-public-read.py \
-            --bucket-name ncn-images \
-            --key-name "k8s/${K8SNEW}/${art}" \
-            --file-name k8s/${K8SVERSION}/${art}
+        cray artifacts create boot-images k8s/${K8SNEW}/${art} k8s/${K8SVERSION}/${art}
     done
     ```
 
 1. (`ncn-mw#`) Upload the new Ceph image into S3.
 
     ```bash
-    /usr/share/doc/csm/scripts/ceph-upload-file-public-read.py \
-        --bucket-name ncn-images \
-        --key-name "ceph/${CEPHNEW}/filesystem.squashfs" \
-        --file-name ceph/${CEPHVERSION}/secure-filesystem.squashfs
+    cray artifacts create boot-images ceph/${CEPHNEW}/filesystem.squashfs ceph/${CEPHVERSION}/secure-filesystem.squashfs
     ```
 
 1. (`ncn-mw#`) Upload the Ceph kernel and `initrd` into S3 under the new version string.
 
     ```bash
     for art in initrd kernel ; do
-        /usr/share/doc/csm/scripts/ceph-upload-file-public-read.py \
-            --bucket-name ncn-images \
-            --key-name "ceph/${CEPHNEW}/${art}" \
-            --file-name ceph/${CEPHVERSION}/${art}
+        cray artifacts create boot-images ceph/${CEPHNEW}/${art} ceph/${CEPHVERSION}/${art}
     done
     ```
 

@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -25,7 +25,7 @@
 function check_quotes {
     local error=0
     printf "=============== Linting \” (https://www.compart.com/en/unicode/U+201C and U+201D) ... \n"
-    grep -n -R \” *.md && echo >&2 'Malformed quotes detected (bad: ” vs. good: ").' && error=1
+    grep -n -RE '“|”' ./* --include "*.md" && echo >&2 'Malformed quotes detected (bad: ” vs. good: ").' && error=1
     if [ $error = 1 ]; then
         echo >&2 "Failed: ${FUNCNAME[0]}"
         return 1
@@ -35,4 +35,3 @@ function check_quotes {
     fi
 }
 check_quotes
-

@@ -26,6 +26,7 @@ accessory drawings in this document are for illustration only, and may not exact
 * [Products supported](#products-supported)
 * [Architecture and naming conventions](#architecture-and-naming-conventions)
 * [Minimum software version requirements](#minimum-software-version-requirements)
+* [Transceiver and cable guide](#transceiver_cable_guide.md)
 * [Changes](#changes)
   * [Enhancements](#enhancements)
   * [Fixes](#fixes)

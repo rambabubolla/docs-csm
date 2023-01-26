@@ -226,11 +226,21 @@ spec:
             valueFrom:
               path: /results/records.yaml
       container:
-        image: registry.local/artifactory.algol60.net/csm-docker/stable/cf-gitea-import:1.8.0-alpha.19_6747be7
+        image: artifactory.algol60.net/csm-docker/stable/cf-gitea-import:1.8.0
         command:
           - "/bin/sh"
+        # args:
+        #   - -c
+        #   - >-
+        #       export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt &&
+        #       update-ca-certificates 2>/dev/null &&
+        #       /opt/csm/cf-gitea-import/argo_entrypoint.sh
         args: ["-c", "/opt/csm/cf-gitea-import/argo_entrypoint.sh"]
         env:
+          # - name: REQUESTS_CA_BUNDLE
+          #   value: /etc/ssl/certs/ca-certificates.crt
+          # - name: SSL_CERT_FILE
+          #   value: /etc/ssl/certs/platform-ca-certs.crt
           - name: CF_IMPORT_GITEA_USER
             valueFrom:
               secretKeyRef:
@@ -257,6 +267,7 @@ spec:
           - name: results
             mountPath: /results
           - name: certs # mount cluster certs to ca-certificates.crt for curl/http libraries
+            # mountPath: /usr/local/share/ca-certificates
             mountPath: /etc/ssl/certs/ca-certificates.crt
             subPath: platform-ca-certs.crt
       volumes:

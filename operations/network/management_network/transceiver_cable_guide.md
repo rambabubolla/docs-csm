@@ -6,7 +6,7 @@ Also the intent of this guide is not to provide you "how-to" cable your system b
 
 ## Helpful tips for navigating the cabling guide
 
-The supported transceivers are broken down by vendor and have direct links to vendor sites for more infomartion.
+The supported transceivers are broken down by vendor and have direct links to vendor sites for more information.
 
 ## Vendors
 
@@ -21,7 +21,6 @@ To get most up to date of supported transceivers, DAC cables, please go to aruba
 [Aruba support portal](https://asp.arubanetworks.com/downloads;products=Aruba%20Switches)
 
 While Aruba does support "third-party" transceivers with 'allow-unsupported-transceiver' command not all vendors are created equal and some transceivers may not work. For example we have seen in the field that transceivers from ENET do not work with Aruba switches.
-
 
 ## JL635A Aruba 8325-48Y8C 48p 25G 8p 100G Switch
 
@@ -41,12 +40,14 @@ Group  Speed  Member Ports      Mismatched Ports
 ```
 
 ### 1G Transceivers
+
 * Aruba 1G SFP LC SX 500m MMF Transceiver (J4858D)
 * Aruba 1G SFP LC LX 10km SMF Transceiver (J4859D)
 * Aruba 1G SFP LC LH 70km SMF Transceiver (J4860D)
 * Aruba 1G SFP RJ45 T 100m Cat5e Transceiver (J8177D)
 
 ### 10G Transceivers and Cables
+
 * Aruba 10G SFP+ LC SR 300m MMF Transceiver (J9150D)
 * Aruba 10G SFP+ LC LR 10km SMF Transceiver (J9151E)
 * Aruba 10G SFP+ LC ER 40km SMF Transceiver (J9153D)
@@ -55,6 +56,7 @@ Group  Speed  Member Ports      Mismatched Ports
 * Aruba 10G SFP+ to SFP+ 3m Direct Attach Copper Cable (J9283D)
 
 ### 25G Transceivers and Cables
+
 * Aruba 25G SFP28 LC SR 100m MMF Transceiver (JL484A)
 * Aruba 25G SFP28 LC eSR 400m MMF Transceiver (JL485A)
 * Aruba 25G SFP28 LC LR 10km SMF Transceiver (JL486A)
@@ -66,6 +68,7 @@ Group  Speed  Member Ports      Mismatched Ports
 * Aruba 25G SFP28 to SFP28 15m Active Optical Cable (R0Z21A)
 
 ### 40G Transceivers and Cables
+
 * Aruba 40G QSFP+ LC BiDi 150m MMF Transceiver (JL308A)
 * HPE X142 40G QSFP+ MPO SR4 Transceiver (JH231A)
 * HPE X142 40G QSFP+ MPO eSR4 300M Transceiver (JH233A)
@@ -80,6 +83,7 @@ Group  Speed  Member Ports      Mismatched Ports
 * HPE QSFP+ to 4xSFP+ 3m Breakout Direct Attach Cable (721064-B21)
 
 ### 100G Transceivers and Cables
+
 * Aruba 100G QSFP28 MPO SR4 MMF Transceiver (JL309A)
 * Aruba 100G QSFP28 LC LR4 SMF Transceiver (JL310A)
 * Aruba 100G QSFP28 LC CWDM4 2km SMF Transceiver (R0Z30A)
@@ -126,6 +130,7 @@ Group  Speed  Member Ports      Mismatched Ports
 (48) 10/100/1000 BASE-T ports, (4) 1/10/25/50G SFP ports
 
 ### 1G Transceivers and cables
+
 * Aruba 1G SFP LC SX 500m MMF Transceiver (J4858D)
 * Aruba 1G SFP LC LX 10km SMF Transceiver (J4859D)
 * Aruba 1G SFP LC LH 70km SMF Transceiver (J4860D)
@@ -135,6 +140,7 @@ Group  Speed  Member Ports      Mismatched Ports
 * Aruba 1G SFP RJ45 T 100m Cat5e TAA Transceiver (JL747A)
 
 ### 10G Transceivers and cables
+
 * Aruba 10G SFP+ LC SR 300m MMF Transceiver (J9150D)
 * Aruba 10G SFP+ LC LRM 220m MMF Transceiver (J9152D)
 * Aruba 10G SFP+ LC LR 10km SMF Transceiver (J9151E)
@@ -144,11 +150,13 @@ Group  Speed  Member Ports      Mismatched Ports
 * Aruba 10G SFP+ LC LR 10km SMF TAA Transceiver (JL749A)
 
 ### 25G Transceivers and cables
+
 * Aruba 25G SFP28 LC SR 100m MMF Transceiver (JL484A)
 * Aruba 25G SFP28 LC eSR 400m MMF Transceiver (JL485A)
 * Aruba 25G SFP28 LC LR 10km SMF Transceiver (JL486A)
 
 ### 50G Transceivers and cables
+
 * Aruba 50G SFP56 LC SR 100m MMF XCVR (R0M48A)
 
 ### Direct attach cables
@@ -171,6 +179,7 @@ Cable (JL489A)
 (32) QSFP+/QSFP28 40/100G Transceivers
  
 ### 40G Transceivers and Cables
+
 * Aruba 40G QSFP+ LC BiDi 150m MMF Transceiver (JL308A)
 * HPE X142 40G QSFP+ MPO SR4 Transceiver (JH231A)
 * HPE X142 40G QSFP+ MPO eSR4 300M Transceiver (JH233A)
@@ -231,15 +240,18 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 ## Dell S3048-ON switch series
 
 ### 100m Transceivers and cables
+
 * Transceiver, SFP, 100BASE-FX, 1310nm wavelength, up to 2km reach
 
 ### 1G Transceivers and cables
+
 * Transceiver, SFP, 1000BASE-T
 * Transceiver, SFP, 1000BASE-SX, 850nm wavelength, up to 550m reach
 * Transceiver, SFP, 1000BASE-LX, 1310nm wavelength, up to 10km reach
 * Transceiver, SFP, 1000BASE-ZX, 1550nm wavelength, up to 80km reach
 
 ### 10G Transceivers and cables
+
 * Transceiver, SFP+, 10GbE, LRM, 1310nm wavelength, up to 220m reach
 * Transceiver, SFP+, 10GbE, SR, 850nm wavelength, up to 300m reach
 * Transceiver, SFP+, 10GbE, LR, 1310nm wavelength, up to 10km reach
@@ -247,6 +259,7 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 * Transceiver, SFP+, 10GbE, ZR, 1550nm wavelength, up to 80km reach
 
 ### Direct attach aables
+
 * Dell EMC Networking cable, SFP+ to SFP+, 10GbE, copper twinax direct attach cable, 0.5m
 * Dell EMC Networking cable, SFP+ to SFP+, 10GbE, copper twinax direct attach cable, 1m
 * Dell EMC Networking cable, SFP+ to SFP+, 10GbE, copper twinax direct attach cable, 3m
@@ -263,6 +276,7 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 4xQSFP28
 
 ### 10GG Transceivers and cables
+
 * SFP-10G
 * USR SFP-10G
 * SR SFP-10G
@@ -273,6 +287,7 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 * DWDM SFP-10G-T
 
 ### 40GbE transceivers
+
 * QSFP-40G-SR4
 * QSFP-40G-ESR4
 * QSFP-40G-LM4
@@ -303,6 +318,7 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 4xQSFP28
 
 ### 10GG Transceivers and cables
+
 * SFP-10G
 * USR SFP-10G
 * SR SFP-10G
@@ -313,6 +329,7 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 * DWDM SFP-10G-T
 
 ### 40GbE transceivers
+
 * QSFP-40G-SR4
 * QSFP-40G-ESR4
 * QSFP-40G-LM4

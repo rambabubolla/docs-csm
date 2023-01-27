@@ -27,6 +27,19 @@ While Aruba does support "third-party" transceivers with 'allow-unsupported-tran
 
 Supports 48 ports of 1G/10G/25GbE (SFP/SFP+/SFP28) and 8 ports of 40G/100GbE (QSFP+/QSFP28) [optional 1GBASE-T and 10GBASE-T transceivers, 4x10G and 4x25G breakout cables]
 
+NOTE: In this particular model, the interfaces are organised into interface groups of 12 ports each. And the default speed setting is 25Gb. If you have mix of devices with different port speeds 1,10 vs 25 for example you need to choose which port block you want to have setup to support 10g devices and all 12 ports in that block are set with that speed so you cannot for example put 10G server and 25G server on group 1.  
+
+```
+8325# sh system interface-group
+------------------------------------------------
+Group  Speed  Member Ports      Mismatched Ports
+------------------------------------------------
+1      25g    1/1/1-1/1/12      
+2      25g    1/1/13-1/1/24     
+3      25g    1/1/25-1/1/36
+4      25g    1/1/37-1/1/48
+```
+
 ### 1G Transceivers
 * Aruba 1G SFP LC SX 500m MMF Transceiver (J4858D)
 * Aruba 1G SFP LC LX 10km SMF Transceiver (J4859D)
@@ -184,7 +197,7 @@ Cable (JL489A)
 
 ## Mellanox
 
-[Mellanox support portal](https://support.mellanox.com)
+[Mellanox support portal](https://www.nvidia.com/en-us/support/enterprise/)
 
 ## SN2100
 

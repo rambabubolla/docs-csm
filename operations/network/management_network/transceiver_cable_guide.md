@@ -28,7 +28,7 @@ Supports 48 ports of 1G/10G/25GbE (SFP/SFP+/SFP28) and 8 ports of 40G/100GbE (QS
 
 NOTE: In this particular model, the interfaces are organised into interface groups of 12 ports each. And the default speed setting is 25Gb. If you have mix of devices with different port speeds 1,10 vs 25 for example you need to choose which port block you want to have setup to support 10g devices and all 12 ports in that block are set with that speed so you cannot for example put 10G server and 25G server on group 1.
 
-```
+```bash
 8325# sh system interface-group
 ------------------------------------------------
 Group  Speed  Member Ports      Mismatched Ports
@@ -177,7 +177,7 @@ Cable (JL489A)
 ## JL636A Aruba 8325-32C 32p 100G Switch
 
 (32) QSFP+/QSFP28 40/100G Transceivers
- 
+
 ### 40G Transceivers and Cables
 
 * Aruba 40G QSFP+ LC BiDi 150m MMF Transceiver (JL308A)

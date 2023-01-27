@@ -1,6 +1,6 @@
 # Transceivers and cables
 
-The intent of this guide is to help you choose correct cabling and transceivers for Shasta management network. However you should only use this guideline to what is supported, as the networking vendors may change supported devices without notification or change required software version to run a "new" type of transceiver or DAC cable. 
+The intent of this guide is to help you choose correct cabling and transceivers for Shasta management network. However you should only use this guideline to what is supported, as the networking vendors may change supported devices without notification or change required software version to run a "new" type of transceiver or DAC cable.
 
 Also the intent of this guide is not to provide you "how-to" cable your system but to depict the supported devices.
 
@@ -16,7 +16,7 @@ The supported transceivers are broken down by vendor and have direct links to ve
 
 ## Aruba
 
-To get most up to date of supported transceivers, DAC cables, please go to aruba support portal and search for "Transceiver guide": 
+To get most up to date of supported transceivers, DAC cables, please go to aruba support portal and search for "Transceiver guide":
 
 [Aruba support portal](https://asp.arubanetworks.com/downloads;products=Aruba%20Switches)
 
@@ -27,7 +27,7 @@ While Aruba does support "third-party" transceivers with 'allow-unsupported-tran
 
 Supports 48 ports of 1G/10G/25GbE (SFP/SFP+/SFP28) and 8 ports of 40G/100GbE (QSFP+/QSFP28) [optional 1GBASE-T and 10GBASE-T transceivers, 4x10G and 4x25G breakout cables]
 
-NOTE: In this particular model, the interfaces are organised into interface groups of 12 ports each. And the default speed setting is 25Gb. If you have mix of devices with different port speeds 1,10 vs 25 for example you need to choose which port block you want to have setup to support 10g devices and all 12 ports in that block are set with that speed so you cannot for example put 10G server and 25G server on group 1.  
+NOTE: In this particular model, the interfaces are organised into interface groups of 12 ports each. And the default speed setting is 25Gb. If you have mix of devices with different port speeds 1,10 vs 25 for example you need to choose which port block you want to have setup to support 10g devices and all 12 ports in that block are set with that speed so you cannot for example put 10G server and 25G server on group 1.
 
 ```
 8325# sh system interface-group
@@ -136,7 +136,7 @@ Group  Speed  Member Ports      Mismatched Ports
 
 ### 10G Transceivers and cables
 * Aruba 10G SFP+ LC SR 300m MMF Transceiver (J9150D)
-* Aruba 10G SFP+ LC LRM 220m MMF Transceiver (J9152D)3
+* Aruba 10G SFP+ LC LRM 220m MMF Transceiver (J9152D)
 * Aruba 10G SFP+ LC LR 10km SMF Transceiver (J9151E)
 * Aruba 10G SFP+ LC ER 40km SMF Transceiver (J9153D)
 * Aruba 10GBASE-T SFP+ RJ-45 30m Cat6A Transceiver (JL563B)
@@ -163,7 +163,7 @@ Cable (JL487A)
 Cable (JL488A)
 * Aruba 25G SFP28 to SFP28 5m Direct Attach Copper
 Cable (JL489A)
-* Aruba 50G SFP56 to SFP56 0.65m DAC Cable (R0M46A)1
+* Aruba 50G SFP56 to SFP56 0.65m DAC Cable (R0M46A)
 * Aruba 50G SFP56 to SFP56 3m DAC Cable (R0M47A
 
 ## JL636A Aruba 8325-32C 32p 100G Switch
@@ -216,7 +216,6 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 
 Supports speeds of 1/10/25/40/50 and 100GbE
 
-
 * QSFP28, SFP28 (with QSA) short and long range optics
 * QQSFP28 to QSFP28 DAC Cable
 * QQSFP breakout cables 100GbE to 4x25GbE DAC, Optical
@@ -267,19 +266,19 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 * SFP-10G
 * USR SFP-10G
 * SR SFP-10G
-* LRM SFP-10G-LR 
-* SFP-10G-ER 
-* SFP-10G-ZR 
+* LRM SFP-10G-LR
+* SFP-10G-ER
+* SFP-10G-ZR
 * SFP-10G-T
 * DWDM SFP-10G-T
 
-### 40GbE transceivers 
+### 40GbE transceivers
 * QSFP-40G-SR4
 * QSFP-40G-ESR4
 * QSFP-40G-LM4
 * QSFP-40G-SM4
 * QSFP-40G-BIDI
-* QSFP-40G-PSM4-LR 
+* QSFP-40G-PSM4-LR
 * QSFP-40G-LR4
 * QSFP-40G-ER4
 
@@ -290,9 +289,9 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 * Q28-100G-ESR4
 * Q28-100G-BIDI
 * Q28-100G-SWDM4
-* Q28-100G-CWDM4 
-* Q28-100G-LR4 
-* Q28-100G-ER4-lite 
+* Q28-100G-CWDM4
+* Q28-100G-LR4
+* Q28-100G-ER4-lite
 * Q28-100G-DWDM2
 
 ## Dell S4148F-ON switch series
@@ -307,19 +306,19 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 * SFP-10G
 * USR SFP-10G
 * SR SFP-10G
-* LRM SFP-10G-LR 
-* SFP-10G-ER 
-* SFP-10G-ZR 
+* LRM SFP-10G-LR
+* SFP-10G-ER
+* SFP-10G-ZR
 * SFP-10G-T
 * DWDM SFP-10G-T
 
-### 40GbE transceivers 
+### 40GbE transceivers
 * QSFP-40G-SR4
 * QSFP-40G-ESR4
 * QSFP-40G-LM4
 * QSFP-40G-SM4
 * QSFP-40G-BIDI
-* QSFP-40G-PSM4-LR 
+* QSFP-40G-PSM4-LR
 * QSFP-40G-LR4
 * QSFP-40G-ER4
 
@@ -330,7 +329,7 @@ Supports speeds of 1/10/25/40/50 and 100GbE
 * Q28-100G-ESR4
 * Q28-100G-BIDI
 * Q28-100G-SWDM4
-* Q28-100G-CWDM4 
-* Q28-100G-LR4 
-* Q28-100G-ER4-lite 
+* Q28-100G-CWDM4
+* Q28-100G-LR4
+* Q28-100G-ER4-lite
 * Q28-100G-DWDM2

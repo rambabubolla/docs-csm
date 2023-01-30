@@ -29,7 +29,7 @@ SAT is installed and configured.
 
 1. (`ncn-m#`) Set the same random password for every BMC on an air-cooled node.
 
-   The command will generate a single random string and apply it to every NodeBMC in the system.
+   The command will generate a single random string and apply it to every Node BMC in the system.
 
     ```bash
     sat bmccreds --xnames $RIVER_NODEBMC_XNAMES --random-password --pw-domain system
